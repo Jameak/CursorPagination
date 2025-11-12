@@ -1,0 +1,22 @@
+﻿{
+  target: {
+    Diagnostics: [
+      {
+        Location: : (7,21)-(7,49),
+        Message: Property 'StringProp' is non-nullable type 'string' but has a null-coalesce expression 'string.Empty'. This is likely unnecessary and may cause your ORM to generate less-optimal SQL.,
+        Severity: Warning,
+        WarningLevel: 1,
+        Descriptor: {
+          Id: JAMCP0008,
+          Title: Non-nullable pagination property has null-coalesce configured,
+          MessageFormat: Property '{0}' is non-nullable type '{1}' but has a null-coalesce expression '{2}'. This is likely unnecessary and may cause your ORM to generate less-optimal SQL.,
+          Category: Usage,
+          DefaultSeverity: Warning,
+          IsEnabledByDefault: true
+        }
+      }
+    ]
+  },
+  generated-code-can-compile: true,
+  generated-code-compilation-diagnostics: []
+}

@@ -1,0 +1,55 @@
+{
+  generated-code-can-compile: false,
+  generated-code-compilation-diagnostics: [
+    {
+      Location: /*
+                return obj =>
+                    obj.ObjectProp! > ObjectPropValue!;
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            case global::Jameak.CursorPagination.Abstractions.Enums.PaginationDirection.Backward:
+*/
+ TestStrategy_K.g.cs: (171,20)-(171,54),
+      Message: Operator '>' cannot be applied to operands of type 'object' and 'object',
+      Severity: Error,
+      Descriptor: {
+        Id: CS0019,
+        Title: ,
+        HelpLink: https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS0019),
+        MessageFormat: Operator '{0}' cannot be applied to operands of type '{1}' and '{2}',
+        Category: Compiler,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true,
+        CustomTags: [
+          Compiler,
+          Telemetry,
+          NotConfigurable
+        ]
+      }
+    },
+    {
+      Location: /*
+                return obj =>
+                    obj.ObjectProp! < ObjectPropValue!;
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            default:
+*/
+ TestStrategy_K.g.cs: (174,20)-(174,54),
+      Message: Operator '<' cannot be applied to operands of type 'object' and 'object',
+      Severity: Error,
+      Descriptor: {
+        Id: CS0019,
+        Title: ,
+        HelpLink: https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS0019),
+        MessageFormat: Operator '{0}' cannot be applied to operands of type '{1}' and '{2}',
+        Category: Compiler,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true,
+        CustomTags: [
+          Compiler,
+          Telemetry,
+          NotConfigurable
+        ]
+      }
+    }
+  ]
+}

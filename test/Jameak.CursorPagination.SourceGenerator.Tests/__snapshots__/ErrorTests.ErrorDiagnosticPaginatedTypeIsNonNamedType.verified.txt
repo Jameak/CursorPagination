@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: : (7,23)-(7,35),
+      Message: The paginated type 'Int32[]' is not supported for source generation,
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0017,
+        Title: Paginated type is not supported kind,
+        MessageFormat: The paginated type '{0}' is not supported for source generation,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

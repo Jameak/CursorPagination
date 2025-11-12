@@ -1,0 +1,26 @@
+﻿{
+  generated-code-can-compile: true,
+  generated-code-compilation-diagnostics: [],
+  analyzer-diagnostics: [
+    {
+      Location: /*
+    {
+        InternalProcessingHelper.ThrowIfPageSizeInvalid(0, false);
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    }
+*/
+ : (6,8)-(6,65),
+      Message: Jameak.CursorPagination.Abstractions.Internal.InternalProcessingHelper is an internal API that supports the library infrastructure and not subject to the same compatibility standards as public APIs. It may be changed or removed without notice in any release.,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: JAMCP0013,
+        Title: Internal CursorPagination API usage,
+        MessageFormat: {0} is an internal API that supports the library infrastructure and not subject to the same compatibility standards as public APIs. It may be changed or removed without notice in any release.,
+        Category: Usage,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: : (7,23)-(7,35),
+      Message: Cannot generate pagination strategy for 'TestStrategy<T>' because source generation for generic strategy-types is not supported,
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0015,
+        Title: Generic strategy type not supported,
+        MessageFormat: Cannot generate pagination strategy for '{0}' because source generation for generic strategy-types is not supported,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

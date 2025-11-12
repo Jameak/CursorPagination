@@ -1,0 +1,22 @@
+﻿{
+  target: {
+    Diagnostics: [
+      {
+        Location: : (6,21)-(6,33),
+        Message: Property 'NullableStringProp' is nullable type 'string?'. This will likely work if your ORM behaves but is not generally supported by this library. It is recommended that you instead create a non-nullable computed property or add a null-coalesce expression to the PaginationPropertyAttribute for this property.,
+        Severity: Warning,
+        WarningLevel: 1,
+        Descriptor: {
+          Id: JAMCP0007,
+          Title: Configured pagination property is nullable,
+          MessageFormat: Property '{0}' is nullable type '{1}'. This will likely work if your ORM behaves but is not generally supported by this library. It is recommended that you instead create a non-nullable computed property or add a null-coalesce expression to the PaginationPropertyAttribute for this property.,
+          Category: Usage,
+          DefaultSeverity: Warning,
+          IsEnabledByDefault: true
+        }
+      }
+    ]
+  },
+  generated-code-can-compile: true,
+  generated-code-compilation-diagnostics: []
+}

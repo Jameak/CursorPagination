@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--PrivateAssets=All so that packaging doesn't expect these to exist as separate Nuget packages-->
+    <ProjectReference Include="..\Jameak.CursorPagination.Abstractions\Jameak.CursorPagination.Abstractions.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Jameak.CursorPagination.SourceGenerator\Jameak.CursorPagination.SourceGenerator.csproj" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Pack the sub-projects into same nuget package as this project, at the folders necessary for source-generators (analyzers/dotnet/cs) and for normal dependencies (lib/TFM)-->
+    <None Include="$(OutputPath)/Jameak.CursorPagination.SourceGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)/Jameak.CursorPagination.Abstractions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)/Jameak.CursorPagination.Abstractions.dll" Pack="true" PackagePath="lib/$(TargetFramework)" Visible="false" />
+    <None Include="$(OutputPath)/Jameak.CursorPagination.Abstractions.xml" Pack="true" PackagePath="lib/$(TargetFramework)" Visible="false" />
+    <None Include="../../$(PackageReadmeFile)" Pack="true" PackagePath="/" Visible="false" />
+    <None Include="../../images/$(PackageIcon)" Pack="true" PackagePath="/" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.224">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

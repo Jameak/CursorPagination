@@ -1,0 +1,11 @@
+﻿[  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__p_0='10', @__p_1='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', @__p_2='False', @__p_3='abc' (Size = 3), @__p_4='10'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT "n"."PrimaryKeyInt", "n"."NullableBoolProp", "n"."NullableGuidProp", "n"."NullableIntProp", "n"."NullableStringProp"
+      FROM "NullableTestTable" AS "n"
+      WHERE COALESCE("n"."NullableIntProp", -2147483648) >= @__p_0 AND (COALESCE("n"."NullableIntProp", -2147483648) > @__p_0 OR (COALESCE("n"."NullableIntProp", -2147483648) = @__p_0 AND COALESCE("n"."NullableGuidProp", 'ABCDABCD-ABCD-ABCD-ABCD-ABCDABCDABCD') < @__p_1) OR (COALESCE("n"."NullableIntProp", -2147483648) = @__p_0 AND COALESCE("n"."NullableGuidProp", 'ABCDABCD-ABCD-ABCD-ABCD-ABCDABCDABCD') = @__p_1 AND COALESCE("n"."NullableBoolProp", 0) > @__p_2) OR (COALESCE("n"."NullableIntProp", -2147483648) = @__p_0 AND COALESCE("n"."NullableGuidProp", 'ABCDABCD-ABCD-ABCD-ABCD-ABCDABCDABCD') = @__p_1 AND COALESCE("n"."NullableBoolProp", 0) = @__p_2 AND COALESCE("n"."NullableStringProp", '') > @__p_3))
+      ORDER BY COALESCE("n"."NullableIntProp", -2147483648), COALESCE("n"."NullableGuidProp", 'ABCDABCD-ABCD-ABCD-ABCD-ABCDABCDABCD') DESC, COALESCE("n"."NullableBoolProp", 0), COALESCE("n"."NullableStringProp", '')
+      LIMIT @__p_4
+]

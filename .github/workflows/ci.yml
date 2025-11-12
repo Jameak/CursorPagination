@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '*'
+    paths:
+      - "src/**"
+      - "test/**"
+      - "samples/**"
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - "src/**"
+      - "test/**"
+      - "samples/**"
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  
+defaults:
+  run:
+    shell: pwsh
+    
+jobs:
+  build-lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.x
+      - run: ./lint-test-and-nuget-test.ps1 -Env "ci"
+      - uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}
+        with:
+          name: '.NET tests'
+          path: 'test/**/TestResults/**/*.trx'
+          reporter: 'dotnet-trx'

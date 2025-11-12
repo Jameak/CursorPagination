@@ -1,0 +1,17 @@
+{
+  Diagnostics: [
+    {
+      Location: : (7,21)-(7,49),
+      Message: Property with name 'ProtectedProperty' has getter which is not accessible from the pagination strategy type,
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0009,
+        Title: Property getter is not accessible,
+        MessageFormat: Property with name '{0}' has getter which is not accessible from the pagination strategy type,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

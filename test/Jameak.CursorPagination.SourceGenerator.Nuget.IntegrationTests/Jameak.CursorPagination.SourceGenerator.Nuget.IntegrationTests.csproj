@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsCheck" Version="4.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile
+        Include="..\Jameak.CursorPagination.SourceGenerator.IntegrationTests\**\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"
+        Exclude="..\Jameak.CursorPagination.SourceGenerator.IntegrationTests\obj\**\*.cs;..\Jameak.CursorPagination.SourceGenerator.IntegrationTests\bin\**\*.cs"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jameak.CursorPagination" Version="$(Version)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

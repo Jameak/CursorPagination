@@ -1,0 +1,23 @@
+<Project>
+    <PropertyGroup>
+        <Authors>Jameak</Authors>
+        <Copyright>Copyright © Jameak</Copyright>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/Jameak/CursorPagination</PackageProjectUrl>
+        <PackageTags>cursor paginate pagination keyset offset skip source generator queryable</PackageTags>
+        <VersionPrefix>1.0.0</VersionPrefix>
+        <VersionSuffix></VersionSuffix>
+        <PackageVersion Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</PackageVersion>
+        <PackageVersion Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>icon.png</PackageIcon>
+        <DefineConstants>$(ExtraDefineConstants);$(DefineConstants)</DefineConstants>
+        <NoWarn>$(ExtraNoWarn1);$(ExtraNoWarn2);$(NoWarn)</NoWarn>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.39" PrivateAssets="All"/>
+    </ItemGroup>
+</Project>

@@ -1,0 +1,17 @@
+{
+  Diagnostics: [
+    {
+      Location: : (8,21)-(8,49),
+      Message: Property with name 'BoolProp' has been defined as pagination property on 'TestKeysetPaginationStrategy' multiple times,
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0003,
+        Title: Duplicate properties defined,
+        MessageFormat: Property with name '{0}' has been defined as pagination property on '{1}' multiple times,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

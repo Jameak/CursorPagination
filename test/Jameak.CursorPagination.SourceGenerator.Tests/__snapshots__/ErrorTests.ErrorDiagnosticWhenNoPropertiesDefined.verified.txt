@@ -1,0 +1,17 @@
+{
+  Diagnostics: [
+    {
+      Location: : (6,21)-(6,49),
+      Message: No pagination properties defined for type 'TestKeysetPaginationStrategy',
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0002,
+        Title: No properties defined,
+        MessageFormat: No pagination properties defined for type '{0}',
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

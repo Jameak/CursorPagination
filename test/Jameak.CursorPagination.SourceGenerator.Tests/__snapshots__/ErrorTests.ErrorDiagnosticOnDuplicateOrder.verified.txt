@@ -1,0 +1,17 @@
+{
+  Diagnostics: [
+    {
+      Location: : (8,21)-(8,49),
+      Message: Multiple properties have been defined with the order-value '0',
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0010,
+        Title: Duplicate property order defined,
+        MessageFormat: Multiple properties have been defined with the order-value '{0}',
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

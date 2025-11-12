@@ -1,0 +1,35 @@
+[  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT COUNT(*)
+      FROM "SimplePropertyTestTable" AS "s"
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__p_0='4'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT "s"."IntProp", "s"."StringProp"
+      FROM "SimplePropertyTestTable" AS "s"
+      ORDER BY "s"."IntProp", "s"."StringProp" DESC
+      LIMIT @__p_0
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__p_1='4', @__p_0='3'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT "s"."IntProp", "s"."StringProp"
+      FROM "SimplePropertyTestTable" AS "s"
+      ORDER BY "s"."IntProp", "s"."StringProp" DESC
+      LIMIT @__p_1 OFFSET @__p_0
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__p_1='4', @__p_0='6'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT "s"."IntProp", "s"."StringProp"
+      FROM "SimplePropertyTestTable" AS "s"
+      ORDER BY "s"."IntProp", "s"."StringProp" DESC
+      LIMIT @__p_1 OFFSET @__p_0
+]

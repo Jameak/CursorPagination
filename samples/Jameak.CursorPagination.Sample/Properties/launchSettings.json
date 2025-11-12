@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Jameak.CursorPagination.Sample": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "launchUrl": "debug/routes",
+      "applicationUrl": "https://localhost:51849;http://localhost:51850"
+    }
+  }
+}

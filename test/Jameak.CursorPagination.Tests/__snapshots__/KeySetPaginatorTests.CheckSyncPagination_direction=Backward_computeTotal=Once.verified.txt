@@ -1,0 +1,37 @@
+[  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT COUNT(*)
+      FROM "SimplePropertyTestTable" AS "s"
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__p_0='4'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT "s"."IntProp", "s"."StringProp"
+      FROM "SimplePropertyTestTable" AS "s"
+      ORDER BY "s"."IntProp" DESC, "s"."StringProp"
+      LIMIT @__p_0
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__IntPropValue_0='4', @__StringPropValue_1='e' (Size = 1), @__p_2='4'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT "s"."IntProp", "s"."StringProp"
+      FROM "SimplePropertyTestTable" AS "s"
+      WHERE "s"."IntProp" <= @__IntPropValue_0 AND ("s"."IntProp" < @__IntPropValue_0 OR ("s"."IntProp" = @__IntPropValue_0 AND "s"."StringProp" > @__StringPropValue_1))
+      ORDER BY "s"."IntProp" DESC, "s"."StringProp"
+      LIMIT @__p_2
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__IntPropValue_0='3', @__StringPropValue_1='d' (Size = 1), @__p_2='4'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT "s"."IntProp", "s"."StringProp"
+      FROM "SimplePropertyTestTable" AS "s"
+      WHERE "s"."IntProp" <= @__IntPropValue_0 AND ("s"."IntProp" < @__IntPropValue_0 OR ("s"."IntProp" = @__IntPropValue_0 AND "s"."StringProp" > @__StringPropValue_1))
+      ORDER BY "s"."IntProp" DESC, "s"."StringProp"
+      LIMIT @__p_2
+]

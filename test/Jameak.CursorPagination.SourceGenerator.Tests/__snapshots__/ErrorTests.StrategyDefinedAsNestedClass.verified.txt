@@ -1,0 +1,17 @@
+{
+  Diagnostics: [
+    {
+      Location: : (9,25)-(9,39),
+      Message: The class 'NestedStrategy' is a nested class which is not supported,
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0012,
+        Title: Nested class is not supported,
+        MessageFormat: The class '{0}' is a nested class which is not supported,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

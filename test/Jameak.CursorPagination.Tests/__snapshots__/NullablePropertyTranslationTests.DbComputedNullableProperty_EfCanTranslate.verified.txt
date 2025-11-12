@@ -1,0 +1,48 @@
+﻿{
+  target: [    
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__ComputedIntPropValue_0='10', @__p_1='10'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT "c"."PrimaryKeyInt", "c"."ComputedIntProp", "c"."NullableIntProp"
+      FROM "ComputedNullableTestTable" AS "c"
+      WHERE "c"."ComputedIntProp" > @__ComputedIntPropValue_0
+      ORDER BY "c"."ComputedIntProp"
+      LIMIT @__p_1
+  ],
+  db-ddl:
+CREATE TABLE "ComputedNullableTestTable" (
+    "PrimaryKeyInt" INTEGER NOT NULL CONSTRAINT "PK_ComputedNullableTestTable" PRIMARY KEY AUTOINCREMENT,
+    "NullableIntProp" INTEGER NULL,
+    "ComputedIntProp" AS (COALESCE(NullableIntProp, -2147483648))
+);
+
+
+CREATE TABLE "NullableTestTable" (
+    "PrimaryKeyInt" INTEGER NOT NULL CONSTRAINT "PK_NullableTestTable" PRIMARY KEY AUTOINCREMENT,
+    "NullableIntProp" INTEGER NULL,
+    "NullableGuidProp" TEXT NULL,
+    "NullableBoolProp" INTEGER NULL,
+    "NullableStringProp" TEXT NULL
+);
+
+
+CREATE TABLE "SimpleFieldTestTable" (
+    "IntField" INTEGER NOT NULL,
+    "StringField" TEXT NOT NULL,
+    CONSTRAINT "PK_SimpleFieldTestTable" PRIMARY KEY ("IntField", "StringField")
+);
+
+
+CREATE TABLE "SimplePropertyTestTable" (
+    "IntProp" INTEGER NOT NULL,
+    "StringProp" TEXT NOT NULL,
+    CONSTRAINT "PK_SimplePropertyTestTable" PRIMARY KEY ("IntProp", "StringProp")
+);
+
+
+CREATE INDEX "IX_ComputedNullableTestTable_ComputedIntProp" ON "ComputedNullableTestTable" ("ComputedIntProp");
+
+
+
+}

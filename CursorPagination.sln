@@ -1,0 +1,84 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36221.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jameak.CursorPagination.Sample", "samples\Jameak.CursorPagination.Sample\Jameak.CursorPagination.Sample.csproj", "{83FD8428-2FD5-4891-835E-384C9DA11AA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{96D1457C-ACB2-4845-82B8-734A133B86C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jameak.CursorPagination.SourceGenerator", "src\Jameak.CursorPagination.SourceGenerator\Jameak.CursorPagination.SourceGenerator.csproj", "{A931E079-B1FA-E5E9-0242-75D08637C70E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jameak.CursorPagination.Abstractions", "src\Jameak.CursorPagination.Abstractions\Jameak.CursorPagination.Abstractions.csproj", "{7ACDF06D-2891-D6C1-580B-050A55EEB5D1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2EBAFB30-422D-4F07-939F-5A045C16B3FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jameak.CursorPagination.SourceGenerator.Tests", "test\Jameak.CursorPagination.SourceGenerator.Tests\Jameak.CursorPagination.SourceGenerator.Tests.csproj", "{D70DF2D8-9406-4651-9DA8-3B6EFC144482}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		nuget.config = nuget.config
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jameak.CursorPagination.SourceGenerator.IntegrationTests", "test\Jameak.CursorPagination.SourceGenerator.IntegrationTests\Jameak.CursorPagination.SourceGenerator.IntegrationTests.csproj", "{5B8B9FAD-6CAB-43E3-94DF-BE97E030825A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jameak.CursorPagination", "src\Jameak.CursorPagination\Jameak.CursorPagination.csproj", "{DA68BB97-7491-4328-A70F-DB0C5344AE71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jameak.CursorPagination.Tests", "test\Jameak.CursorPagination.Tests\Jameak.CursorPagination.Tests.csproj", "{73D0B71E-550C-40A6-9395-C6DD51FE34F7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83FD8428-2FD5-4891-835E-384C9DA11AA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83FD8428-2FD5-4891-835E-384C9DA11AA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83FD8428-2FD5-4891-835E-384C9DA11AA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83FD8428-2FD5-4891-835E-384C9DA11AA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A931E079-B1FA-E5E9-0242-75D08637C70E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A931E079-B1FA-E5E9-0242-75D08637C70E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A931E079-B1FA-E5E9-0242-75D08637C70E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A931E079-B1FA-E5E9-0242-75D08637C70E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ACDF06D-2891-D6C1-580B-050A55EEB5D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ACDF06D-2891-D6C1-580B-050A55EEB5D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ACDF06D-2891-D6C1-580B-050A55EEB5D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ACDF06D-2891-D6C1-580B-050A55EEB5D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D70DF2D8-9406-4651-9DA8-3B6EFC144482}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D70DF2D8-9406-4651-9DA8-3B6EFC144482}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D70DF2D8-9406-4651-9DA8-3B6EFC144482}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D70DF2D8-9406-4651-9DA8-3B6EFC144482}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B8B9FAD-6CAB-43E3-94DF-BE97E030825A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B8B9FAD-6CAB-43E3-94DF-BE97E030825A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B8B9FAD-6CAB-43E3-94DF-BE97E030825A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B8B9FAD-6CAB-43E3-94DF-BE97E030825A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA68BB97-7491-4328-A70F-DB0C5344AE71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA68BB97-7491-4328-A70F-DB0C5344AE71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA68BB97-7491-4328-A70F-DB0C5344AE71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA68BB97-7491-4328-A70F-DB0C5344AE71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73D0B71E-550C-40A6-9395-C6DD51FE34F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73D0B71E-550C-40A6-9395-C6DD51FE34F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73D0B71E-550C-40A6-9395-C6DD51FE34F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73D0B71E-550C-40A6-9395-C6DD51FE34F7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{83FD8428-2FD5-4891-835E-384C9DA11AA0} = {96D1457C-ACB2-4845-82B8-734A133B86C8}
+		{A931E079-B1FA-E5E9-0242-75D08637C70E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{7ACDF06D-2891-D6C1-580B-050A55EEB5D1} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{D70DF2D8-9406-4651-9DA8-3B6EFC144482} = {2EBAFB30-422D-4F07-939F-5A045C16B3FC}
+		{5B8B9FAD-6CAB-43E3-94DF-BE97E030825A} = {2EBAFB30-422D-4F07-939F-5A045C16B3FC}
+		{DA68BB97-7491-4328-A70F-DB0C5344AE71} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{73D0B71E-550C-40A6-9395-C6DD51FE34F7} = {2EBAFB30-422D-4F07-939F-5A045C16B3FC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BECDDAC7-F4B7-4B19-97AE-7982662CD5BC}
+	EndGlobalSection
+EndGlobal

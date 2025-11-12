@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: : (7,23)-(7,35),
+      Message: Cannot generate 'TestStrategy' because the configured pagination type 'TestInput<>' is an unbound generic type. Source generation for unbound generics is not supported.,
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0014,
+        Title: Unbound generic type not supported,
+        MessageFormat: Cannot generate '{0}' because the configured pagination type '{1}' is an unbound generic type. Source generation for unbound generics is not supported.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

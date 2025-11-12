@@ -1,0 +1,16 @@
+@Sample_HostAddress = https://localhost:51849
+
+GET {{Sample_HostAddress}}/api/PaginatedData/PaginateByKeySetCursor?afterCursor=eyIwIjoiNjM4ODk0MDU0MjAyNjQ4NTQxOlVuIiwiMSI6OTAxfQ
+Accept: application/json
+
+###
+
+GET {{Sample_HostAddress}}/api/PaginatedData/PaginateByOffsetCursor?afterCursor=MTAw
+Accept: application/json
+
+###
+
+GET {{Sample_HostAddress}}/api/PaginatedData/PaginateByPageNumber?pageNumber=2
+Accept: application/json
+
+###

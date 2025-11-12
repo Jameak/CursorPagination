@@ -1,0 +1,17 @@
+{
+  Diagnostics: [
+    {
+      Location: : (7,13)-(7,29),
+      Message: The class 'InternalStrategy' is annotated with generator attribute but is not partial,
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0011,
+        Title: Class is missing partial keyword,
+        MessageFormat: The class '{0}' is annotated with generator attribute but is not partial,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

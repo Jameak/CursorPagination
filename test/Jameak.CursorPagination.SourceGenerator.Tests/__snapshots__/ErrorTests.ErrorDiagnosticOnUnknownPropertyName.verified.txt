@@ -1,0 +1,17 @@
+{
+  Diagnostics: [
+    {
+      Location: : (7,21)-(7,49),
+      Message: Cannot find property or field with name 'PropertyThatDoesNotExist' on type 'TestNamespace.TestInput', or it is not accessible from the pagination strategy type,
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0005,
+        Title: Cannot find property,
+        MessageFormat: Cannot find property or field with name '{0}' on type '{1}', or it is not accessible from the pagination strategy type,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

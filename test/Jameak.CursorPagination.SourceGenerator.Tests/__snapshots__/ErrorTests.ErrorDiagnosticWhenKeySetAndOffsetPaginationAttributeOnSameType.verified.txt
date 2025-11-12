@@ -1,0 +1,30 @@
+{
+  Diagnostics: [
+    {
+      Location: : (8,21)-(8,43),
+      Message: Pagination strategy with type 'TestPaginationStrategy' cannot be declared with both 'KeySetPaginationStrategyAttribute' and 'OffsetPaginationStrategyAttribute',
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0006,
+        Title: Pagination strategy cannot be declared with both KeySet and Offset pagination attributes,
+        MessageFormat: Pagination strategy with type '{0}' cannot be declared with both '{1}' and '{2}',
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: : (8,21)-(8,43),
+      Message: Pagination strategy with type 'TestPaginationStrategy' cannot be declared with both 'KeySetPaginationStrategyAttribute' and 'OffsetPaginationStrategyAttribute',
+      Severity: Error,
+      Descriptor: {
+        Id: JAMCP0006,
+        Title: Pagination strategy cannot be declared with both KeySet and Offset pagination attributes,
+        MessageFormat: Pagination strategy with type '{0}' cannot be declared with both '{1}' and '{2}',
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}
