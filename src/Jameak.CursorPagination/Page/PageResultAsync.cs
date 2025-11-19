@@ -16,13 +16,15 @@ public sealed class PageResultAsync<T, TCursor> where TCursor : ICursor
         bool? hasNextPage,
         int? totalCount,
         NextPageAsync<T, TCursor> nextPageAsyncFunc,
-        TCursor? nextCursor)
+        TCursor? nextCursor,
+        Func<Task<bool>> hasPreviousPageAsyncFunc)
     {
         HasNextPage = hasNextPage;
         TotalCount = totalCount;
         Items = items;
         NextPageAsyncFunc = nextPageAsyncFunc;
         NextCursor = nextCursor;
+        HasPreviousPageAsyncFunc = hasPreviousPageAsyncFunc;
     }
 
     /// <summary>
@@ -55,10 +57,21 @@ public sealed class PageResultAsync<T, TCursor> where TCursor : ICursor
     public TCursor? NextCursor { get; }
 
     private NextPageAsync<T, TCursor> NextPageAsyncFunc { get; }
+    private Func<Task<bool>> HasPreviousPageAsyncFunc { get; }
 
     /// <summary>
     /// Asynchronously retrieves the next page, using the same pagination options as specified for this page.
     /// </summary>
     /// <returns>The next page of data.</returns>
-    public Task<PageResultAsync<T, TCursor>> NextPageAsync(CancellationToken cancellationToken = default) => NextPageAsyncFunc(cancellationToken);
+    public async Task<PageResultAsync<T, TCursor>> NextPageAsync(CancellationToken cancellationToken = default) => await NextPageAsyncFunc(cancellationToken);
+
+    /// <summary>
+    /// Returns true when a previous page exists.
+    /// </summary>
+    /// <remarks>
+    /// <para>Note that the definition of 'does a previous page exist' depends on the chosen pagination algorithm.</para>
+    /// <para>For KeySet-pagination this returns <see langword="true"/> if data exists before the current page.</para>
+    /// <para>For Offset-pagination this returns <see langword="true"/> if the current page is <b>not the first page</b>.</para>
+    /// </remarks>
+    public async Task<bool> HasPreviousPageAsync() => await HasPreviousPageAsyncFunc();
 }

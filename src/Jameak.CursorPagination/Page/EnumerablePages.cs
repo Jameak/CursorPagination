@@ -15,6 +15,7 @@ namespace Jameak.CursorPagination.Page;
 ///     // Use the page data
 /// }
 /// </code>
+/// <para>The initial iteration of the enumerator produces the 'startPage' initial value, as per the rules of the Enumerator interface.</para>
 /// </remarks>
 /// <typeparam name="T">The type of the data.</typeparam>
 /// <typeparam name="TCursor">The cursor type.</typeparam>

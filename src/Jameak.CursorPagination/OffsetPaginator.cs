@@ -10,6 +10,12 @@ namespace Jameak.CursorPagination;
 /// </summary>
 public static class OffsetPaginator
 {
+    private static bool HasPreviousPage(OffsetCursor? afterCursor)
+    {
+        // If this is the first page then it does not have a previous page. Otherwise it does.
+        return afterCursor != null && afterCursor.Skip != 0;
+    }
+
     #region Sync
     private static PageResult<T, OffsetCursor> InternalApplyPagination<T>(
         IOffsetPaginationStrategy<T> strategy,
@@ -36,10 +42,7 @@ public static class OffsetPaginator
 
         var postProcessed = strategy.PostProcessMaterializedResult(materialized, pageSize, computeNextPage != ComputeNextPage.Never, paginationDirection, afterCursor, out var hasNextPage)
             .ToList();
-
-        var nextCursorElement = paginationDirection == PaginationDirection.Forward
-            ? postProcessed.LastOrDefault()
-            : postProcessed.FirstOrDefault();
+        var (previousCursorElement, nextCursorElement) = InternalPaginatorHelper.GetCursorElements(postProcessed, paginationDirection);
 
         NextPage<T, OffsetCursor> NextPageGenerator(OffsetCursor nextCursor)
         {
@@ -54,9 +57,23 @@ public static class OffsetPaginator
                 computeTotalCount: computeTotalCount);
         }
 
-        var nextPageFunc = InternalPaginatorHelper.DetermineNextPageFunc(NextPageGenerator, elem => elem.Cursor, nextCursorElement, totalCount, hasNextPage, computeNextPage);
+        var hasPreviousPage = HasPreviousPage(afterCursor);
 
-        return new PageResult<T, OffsetCursor>(postProcessed, hasNextPage, totalCount, nextPageFunc, nextCursorElement?.Cursor);
+        var nextPageFunc = InternalPaginatorHelper.DetermineNextPageFunc(
+            NextPageGenerator,
+            elem => elem.Cursor,
+            nextCursorElement,
+            new InternalPaginatorHelper.EmptyNextPageState(totalCount, () => hasPreviousPage),
+            hasNextPage,
+            computeNextPage);
+
+        return new PageResult<T, OffsetCursor>(
+            postProcessed,
+            hasNextPage,
+            totalCount,
+            nextPageFunc,
+            nextCursorElement?.Cursor,
+            () => hasPreviousPage);
     }
 
     /// <summary>
@@ -183,7 +200,7 @@ public static class OffsetPaginator
         IOffsetPaginationStrategy<T> strategy,
         IQueryable<T> queryable,
         ToListAsync<T> asyncMaterializationFunc,
-        CountAsync<T>? asyncCountFunc,
+        CountAsync<T> asyncCountFunc,
         OffsetCursor? afterCursor,
         int pageSize,
         ComputeNextPage computeNextPage,
@@ -195,16 +212,12 @@ public static class OffsetPaginator
         ArgumentNullException.ThrowIfNull(strategy);
         ArgumentNullException.ThrowIfNull(queryable);
         ArgumentNullException.ThrowIfNull(asyncMaterializationFunc);
+        ArgumentNullException.ThrowIfNull(asyncCountFunc);
         InternalPaginatorHelper.ThrowIfEnumNotDefined(computeNextPage);
         InternalPaginatorHelper.ThrowIfEnumNotDefined(computeTotalCount);
 
         if (InternalPaginatorHelper.ShouldComputeTotalCount(totalCount.HasValue, computeTotalCount))
         {
-            if (asyncCountFunc == null)
-            {
-                throw new ArgumentException($"Argument '{nameof(asyncCountFunc)}' must be non-null when total count computation is enabled", nameof(asyncCountFunc));
-            }
-
             totalCount = await asyncCountFunc(queryable, cancellationToken);
         }
 
@@ -214,9 +227,7 @@ public static class OffsetPaginator
         var postProcessed = strategy.PostProcessMaterializedResult(materialized, pageSize, computeNextPage != ComputeNextPage.Never, paginationDirection, afterCursor, out var hasNextPage)
             .ToList();
 
-        var nextCursorElement = paginationDirection == PaginationDirection.Forward
-            ? postProcessed.LastOrDefault()
-            : postProcessed.FirstOrDefault();
+        var (previousCursorElement, nextCursorElement) = InternalPaginatorHelper.GetCursorElements(postProcessed, paginationDirection);
 
         NextPageAsync<T, OffsetCursor> NextPageAsyncGenerator(OffsetCursor nextCursor)
         {
@@ -234,11 +245,15 @@ public static class OffsetPaginator
                 cancellationToken: cancellationToken);
         }
 
+        var hasPreviousPage = HasPreviousPage(afterCursor);
+
+        Task<bool> hasPreviousPageFunc() => Task.FromResult(hasPreviousPage);
+
         var nextPageAsyncFunc = InternalPaginatorHelper.DetermineNextPageAsyncFunc(
             NextPageAsyncGenerator,
             elem => elem.Cursor,
             nextCursorElement,
-            totalCount,
+            new InternalPaginatorHelper.EmptyNextPageStateAsync(totalCount, hasPreviousPageFunc),
             hasNextPage,
             computeNextPage);
 
@@ -247,7 +262,8 @@ public static class OffsetPaginator
             hasNextPage,
             totalCount,
             nextPageAsyncFunc,
-            nextCursorElement?.Cursor);
+            nextCursorElement?.Cursor,
+            hasPreviousPageFunc);
     }
 
     /// <summary>
@@ -257,7 +273,7 @@ public static class OffsetPaginator
     /// <param name="strategy">The Offset pagination strategy to use for pagination.</param>
     /// <param name="queryable">The <see cref="IQueryable{T}"/> to paginate</param>
     /// <param name="asyncMaterializationFunc">The function to use to perform async materialization of the <see cref="IQueryable{T}"/></param>
-    /// <param name="asyncCountFunc">The function to use to perform async counting of the <see cref="IQueryable{T}"/></param>
+    /// <param name="asyncCountFunc">The function to use to perform async counting of the <see cref="IQueryable{T}"/>.</param>
     /// <param name="afterCursor">The cursor to use as the starting point for the pagination. To retrieve the first page, pass in <see langword="null"/>.</param>
     /// <param name="pageSize">The size of the page.</param>
     /// <param name="computeNextPage">Controls whether each page should check if a next page exists.</param>
@@ -279,7 +295,7 @@ public static class OffsetPaginator
         IOffsetPaginationStrategy<T> strategy,
         IQueryable<T> queryable,
         ToListAsync<T> asyncMaterializationFunc,
-        CountAsync<T>? asyncCountFunc,
+        CountAsync<T> asyncCountFunc,
         OffsetCursor? afterCursor,
         int pageSize,
         ComputeNextPage computeNextPage = ComputeNextPage.EveryPage,
@@ -308,7 +324,7 @@ public static class OffsetPaginator
     /// <param name="strategy">The Offset pagination strategy to use for pagination.</param>
     /// <param name="queryable">The <see cref="IQueryable{T}"/> to paginate</param>
     /// <param name="asyncMaterializationFunc">The function to use to perform async materialization of the <see cref="IQueryable{T}"/></param>
-    /// <param name="asyncCountFunc">The function to use to perform async counting of the <see cref="IQueryable{T}"/></param>
+    /// <param name="asyncCountFunc">The function to use to perform async counting of the <see cref="IQueryable{T}"/>.</param>
     /// <param name="afterCursorString">The opaque cursor string to use as the starting point for the pagination. To retrieve the first page, pass in <see langword="null"/>.</param>
     /// <param name="pageSize">The size of the page.</param>
     /// <param name="computeNextPage">Controls whether each page should check if a next page exists.</param>
@@ -330,7 +346,7 @@ public static class OffsetPaginator
         IOffsetPaginationStrategy<T> strategy,
         IQueryable<T> queryable,
         ToListAsync<T> asyncMaterializationFunc,
-        CountAsync<T>? asyncCountFunc,
+        CountAsync<T> asyncCountFunc,
         string? afterCursorString,
         int pageSize,
         ComputeNextPage computeNextPage = ComputeNextPage.EveryPage,
@@ -360,7 +376,7 @@ public static class OffsetPaginator
     /// <param name="strategy">The Offset pagination strategy to use for pagination.</param>
     /// <param name="queryable">The <see cref="IQueryable{T}"/> to paginate</param>
     /// <param name="asyncMaterializationFunc">The function to use to perform async materialization of the <see cref="IQueryable{T}"/></param>
-    /// <param name="asyncCountFunc">The function to use to perform async counting of the <see cref="IQueryable{T}"/></param>
+    /// <param name="asyncCountFunc">The function to use to perform async counting of the <see cref="IQueryable{T}"/>.</param>
     /// <param name="pageNumber">The 1-indexed page to retrieve.</param>
     /// <param name="pageSize">The size of the page.</param>
     /// <param name="computeNextPage">Controls whether each page should check if a next page exists.</param>
@@ -383,7 +399,7 @@ public static class OffsetPaginator
         IOffsetPaginationStrategy<T> strategy,
         IQueryable<T> queryable,
         ToListAsync<T> asyncMaterializationFunc,
-        CountAsync<T>? asyncCountFunc,
+        CountAsync<T> asyncCountFunc,
         int pageNumber,
         int pageSize,
         ComputeNextPage computeNextPage = ComputeNextPage.EveryPage,

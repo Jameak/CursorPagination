@@ -57,6 +57,7 @@ public class PaginatedBatchJob : BackgroundService
                 dtoQueryable,
                 DelegateMethods.ToListAsyncDelegate(),
                 DelegateMethods.CountAsyncDelegate(),
+                DelegateMethods.AnyAsyncDelegate(),
                 null,
                 PageSize,
                 computeTotalCount: Enums.ComputeTotalCount.Once,

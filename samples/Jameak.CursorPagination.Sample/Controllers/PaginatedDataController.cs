@@ -39,6 +39,7 @@ public class PaginatedDataController : ControllerBase
             GetDtoQueryable(),
             DelegateMethods.ToListAsyncDelegate(),
             DelegateMethods.CountAsyncDelegate(),
+            DelegateMethods.AnyAsyncDelegate(),
             afterCursor,
             PageSize,
             computeTotalCount: Enums.ComputeTotalCount.Once,
@@ -52,7 +53,8 @@ public class PaginatedDataController : ControllerBase
                 // Entirely up to your use-case how much of this page metadata makes sense to compute and fill out.
                 TotalCount = page.TotalCount!.Value,
                 HasNextPage = page.HasNextPage!.Value,
-                NextPageCursor = page.NextCursor == null ? null : _keySetPaginationStrategy.CursorToString(page.NextCursor)
+                HasPreviousPage = await page.HasPreviousPageAsync(),
+                NextPageCursor = page.NextCursor == null ? null : _keySetPaginationStrategy.CursorToString(page.NextCursor),
             },
             Data = page.Items.Select(item => new DataWithCursor
             {
@@ -85,6 +87,7 @@ public class PaginatedDataController : ControllerBase
             {
                 TotalCount = page.TotalCount!.Value,
                 HasNextPage = page.HasNextPage!.Value,
+                HasPreviousPage = await page.HasPreviousPageAsync(),
                 NextPageCursor = page.NextCursor?.CursorToString()
             },
             Data = page.Items.Select(item => new DataWithCursor
@@ -118,6 +121,7 @@ public class PaginatedDataController : ControllerBase
             {
                 TotalCount = page.TotalCount!.Value,
                 HasNextPage = page.HasNextPage!.Value,
+                HasPreviousPage = await page.HasPreviousPageAsync(),
                 NextPageCursor = page.NextCursor?.CursorToString()
             },
             Data = page.Items.Select(item => new DataWithCursor

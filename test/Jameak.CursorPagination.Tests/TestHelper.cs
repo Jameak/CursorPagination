@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Jameak.CursorPagination.Abstractions;
 using Jameak.CursorPagination.Abstractions.Enums;
-using Jameak.CursorPagination.Tests.DbTests;
+using Jameak.CursorPagination.Tests.DbClasses;
 using Jameak.CursorPagination.Tests.InputClasses;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,11 +44,6 @@ public static partial class TestHelper
 
         settings.ScrubLinesWithReplace(line => DurationLogRegex().Replace(line, "(scrubbed execution time)"));
         return settings;
-    }
-
-    public static IQueryable<SimplePropertyPoco> TaggedTestTable(TestDbContext dbContext)
-    {
-        return TagTestQueryable(dbContext.SimplePropertyTestTable);
     }
 
     public static IQueryable<T> TagTestQueryable<T>(IQueryable<T> queryable)

@@ -1,6 +1,6 @@
 ﻿using Jameak.CursorPagination.Abstractions.Enums;
 using Jameak.CursorPagination.Abstractions.Exceptions;
-using Jameak.CursorPagination.Tests.DbTests;
+using Jameak.CursorPagination.Tests.DbClasses;
 using Jameak.CursorPagination.Tests.InputClasses;
 
 namespace Jameak.CursorPagination.Tests;

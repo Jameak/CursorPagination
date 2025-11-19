@@ -16,13 +16,15 @@ public sealed class PageResult<T, TCursor> where TCursor : ICursor
         bool? hasNextPage,
         int? totalCount,
         NextPage<T, TCursor> nextPageFunc,
-        TCursor? nextCursor)
+        TCursor? nextCursor,
+        Func<bool> hasPreviousPageFunc)
     {
         HasNextPage = hasNextPage;
         TotalCount = totalCount;
         Items = items;
         NextPageFunc = nextPageFunc;
         NextCursor = nextCursor;
+        HasPreviousPageFunc = hasPreviousPageFunc;
     }
 
     /// <summary>
@@ -55,10 +57,21 @@ public sealed class PageResult<T, TCursor> where TCursor : ICursor
     public TCursor? NextCursor { get; }
 
     private NextPage<T, TCursor> NextPageFunc { get; }
+    private Func<bool> HasPreviousPageFunc { get; }
 
     /// <summary>
     /// Retrieves the next page, using the same pagination options as specified for this page.
     /// </summary>
     /// <returns>The next page of data.</returns>
     public PageResult<T, TCursor> NextPage() => NextPageFunc();
+
+    /// <summary>
+    /// Returns true when a previous page exists.
+    /// </summary>
+    /// <remarks>
+    /// <para>Note that the definition of 'does a previous page exist' depends on the chosen pagination algorithm.</para>
+    /// <para>For KeySet-pagination this returns <see langword="true"/> if data exists before the current page.</para>
+    /// <para>For Offset-pagination this returns <see langword="true"/> if the current page is <b>not the first page</b>.</para>
+    /// </remarks>
+    public bool HasPreviousPage() => HasPreviousPageFunc();
 }

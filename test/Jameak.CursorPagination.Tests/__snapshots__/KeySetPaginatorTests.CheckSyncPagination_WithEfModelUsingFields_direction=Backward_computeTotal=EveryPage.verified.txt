@@ -16,6 +16,15 @@ info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Da
       LIMIT @__p_0
   
 info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__IntFieldValue_0='6', @__StringFieldValue_1='e' (Size = 1)], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT EXISTS (
+          SELECT 1
+          FROM "SimpleFieldTestTable" AS "s"
+          WHERE "s"."IntField" >= @__IntFieldValue_0 AND ("s"."IntField" > @__IntFieldValue_0 OR ("s"."IntField" = @__IntFieldValue_0 AND "s"."StringField" < @__StringFieldValue_1)))
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
       Executed DbCommand (scrubbed execution time) [Parameters=[], CommandType='Text', CommandTimeout='30']
       -- TaggedTestQueryable
       
@@ -33,6 +42,15 @@ info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Da
       LIMIT @__p_2
   
 info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__IntFieldValue_0='3', @__StringFieldValue_1='b' (Size = 1)], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT EXISTS (
+          SELECT 1
+          FROM "SimpleFieldTestTable" AS "s"
+          WHERE "s"."IntField" >= @__IntFieldValue_0 AND ("s"."IntField" > @__IntFieldValue_0 OR ("s"."IntField" = @__IntFieldValue_0 AND "s"."StringField" < @__StringFieldValue_1)))
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
       Executed DbCommand (scrubbed execution time) [Parameters=[], CommandType='Text', CommandTimeout='30']
       -- TaggedTestQueryable
       
@@ -48,4 +66,13 @@ info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Da
       WHERE "s"."IntField" <= @__IntFieldValue_0 AND ("s"."IntField" < @__IntFieldValue_0 OR ("s"."IntField" = @__IntFieldValue_0 AND "s"."StringField" > @__StringFieldValue_1))
       ORDER BY "s"."IntField" DESC, "s"."StringField"
       LIMIT @__p_2
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__IntFieldValue_0='2', @__StringFieldValue_1='b' (Size = 1)], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT EXISTS (
+          SELECT 1
+          FROM "SimpleFieldTestTable" AS "s"
+          WHERE "s"."IntField" >= @__IntFieldValue_0 AND ("s"."IntField" > @__IntFieldValue_0 OR ("s"."IntField" = @__IntFieldValue_0 AND "s"."StringField" < @__StringFieldValue_1)))
 ]

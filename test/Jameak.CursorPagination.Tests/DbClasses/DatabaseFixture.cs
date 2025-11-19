@@ -1,7 +1,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace Jameak.CursorPagination.Tests.DbTests;
+namespace Jameak.CursorPagination.Tests.DbClasses;
 public sealed class DatabaseFixture : IDisposable
 {
     private readonly SqliteConnection _connection;

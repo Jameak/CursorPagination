@@ -29,5 +29,5 @@ public enum PaginationDirection
     /// <para>Notice that this produces the dataset paginated backwards, but with each page representing the data in the non-reverse order.</para>
     /// <para>If you need the data in reverse order, instead perform a Forward pagination on the opposite sort-order instead (ascending vs. descending)</para>
     /// </remarks>
-    Backward = 2
+    Backward = 2,
 }

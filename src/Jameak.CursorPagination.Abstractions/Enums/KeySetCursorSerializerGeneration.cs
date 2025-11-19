@@ -21,5 +21,5 @@ public enum KeySetCursorSerializerGeneration
     /// <remarks>
     /// The source-generated implementation uses a <b>JsonNamingPolicy</b> to hide the paginated cursors property names.
     /// </remarks>
-    UseSystemTextJson = 2
+    UseSystemTextJson = 2,
 }

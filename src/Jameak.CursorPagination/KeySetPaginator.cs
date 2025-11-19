@@ -11,6 +11,23 @@ namespace Jameak.CursorPagination;
 /// </summary>
 public static class KeySetPaginator
 {
+    private static IQueryable<T> CreateHasPreviousDataQueryable<T, TCursor>(
+        IKeySetPaginationStrategy<T, TCursor> strategy,
+        IQueryable<T> queryable,
+        T previousCursorElement,
+        PaginationDirection paginationDirection)
+        where TCursor : IKeySetCursor
+    {
+        var previousPageCursor = strategy.CreateCursor(previousCursorElement);
+        var funcs = strategy.BuildPaginationMethods(
+            pageSize: 1,
+            checkHasNextPage: false,
+            InternalPaginatorHelper.InvertDirection(paginationDirection),
+            previousPageCursor);
+
+        return funcs.applyWhereExpr(queryable);
+    }
+
     #region Sync
     private static PageResult<T, TCursor> InternalApplyPagination<T, TCursor>(
         IKeySetPaginationStrategy<T, TCursor> strategy,
@@ -37,9 +54,7 @@ public static class KeySetPaginator
         var materialized = paginatedQueryable.ToList();
 
         strategy.PostProcessMaterializedResultInPlace(materialized, pageSize, computeNextPage != ComputeNextPage.Never, paginationDirection, out var hasNextPage);
-        var nextCursorElement = paginationDirection == PaginationDirection.Forward
-            ? materialized.LastOrDefault()
-            : materialized.FirstOrDefault();
+        var (previousCursorElement, nextCursorElement) = InternalPaginatorHelper.GetCursorElements(materialized, paginationDirection);
 
         NextPage<T, TCursor> NextPageGenerator(TCursor nextCursor)
         {
@@ -54,11 +69,16 @@ public static class KeySetPaginator
                 computeTotalCount: computeTotalCount);
         }
 
+        bool HasPreviousPageFunc()
+        {
+            return previousCursorElement != null && CreateHasPreviousDataQueryable(strategy, queryable, previousCursorElement, paginationDirection).Any();
+        }
+
         var nextPageFunc = InternalPaginatorHelper.DetermineNextPageFunc(
             NextPageGenerator,
             strategy.CreateCursor,
             nextCursorElement,
-            totalCount,
+            new InternalPaginatorHelper.EmptyNextPageState(totalCount, HasPreviousPageFunc),
             hasNextPage,
             computeNextPage);
 
@@ -67,7 +87,8 @@ public static class KeySetPaginator
             hasNextPage,
             totalCount,
             nextPageFunc,
-            nextCursorElement == null ? default : strategy.CreateCursor(nextCursorElement));
+            nextCursorElement == null ? default : strategy.CreateCursor(nextCursorElement),
+            HasPreviousPageFunc);
     }
 
     /// <summary>
@@ -153,7 +174,8 @@ public static class KeySetPaginator
         IKeySetPaginationStrategy<T, TCursor> strategy,
         IQueryable<T> queryable,
         ToListAsync<T> asyncMaterializationFunc,
-        CountAsync<T>? asyncCountFunc,
+        CountAsync<T> asyncCountFunc,
+        AnyAsync<T> asyncAnyFunc,
         TCursor? afterCursor,
         int pageSize,
         ComputeNextPage computeNextPage,
@@ -166,16 +188,12 @@ public static class KeySetPaginator
         ArgumentNullException.ThrowIfNull(strategy);
         ArgumentNullException.ThrowIfNull(queryable);
         ArgumentNullException.ThrowIfNull(asyncMaterializationFunc);
+        ArgumentNullException.ThrowIfNull(asyncCountFunc);
         InternalPaginatorHelper.ThrowIfEnumNotDefined(computeNextPage);
         InternalPaginatorHelper.ThrowIfEnumNotDefined(computeTotalCount);
 
         if (InternalPaginatorHelper.ShouldComputeTotalCount(totalCount.HasValue, computeTotalCount))
         {
-            if (asyncCountFunc == null)
-            {
-                throw new ArgumentException($"Argument '{nameof(asyncCountFunc)}' must be non-null when total count computation is enabled", nameof(asyncCountFunc));
-            }
-
             totalCount = await asyncCountFunc(queryable, cancellationToken);
         }
 
@@ -183,10 +201,7 @@ public static class KeySetPaginator
         var materialized = await asyncMaterializationFunc(paginatedQueryable, cancellationToken);
 
         strategy.PostProcessMaterializedResultInPlace(materialized, pageSize, computeNextPage != ComputeNextPage.Never, paginationDirection, out var hasNextPage);
-
-        var nextCursorElement = paginationDirection == PaginationDirection.Forward
-            ? materialized.LastOrDefault()
-            : materialized.FirstOrDefault();
+        var (previousCursorElement, nextCursorElement) = InternalPaginatorHelper.GetCursorElements(materialized, paginationDirection);
 
         NextPageAsync<T, TCursor> NextPageAsyncGenerator(TCursor nextCursor)
         {
@@ -195,6 +210,7 @@ public static class KeySetPaginator
                 queryable: queryable,
                 asyncMaterializationFunc: asyncMaterializationFunc,
                 asyncCountFunc: asyncCountFunc,
+                asyncAnyFunc: asyncAnyFunc,
                 afterCursor: nextCursor,
                 pageSize: pageSize,
                 computeNextPage: computeNextPage,
@@ -204,11 +220,17 @@ public static class KeySetPaginator
                 cancellationToken: cancellationToken);
         }
 
+        async Task<bool> HasPreviousPageFuncAsync()
+        {
+            return previousCursorElement != null
+                && await asyncAnyFunc(CreateHasPreviousDataQueryable(strategy, queryable, previousCursorElement, paginationDirection), cancellationToken);
+        }
+
         var nextPageAsyncFunc = InternalPaginatorHelper.DetermineNextPageAsyncFunc(
             NextPageAsyncGenerator,
             strategy.CreateCursor,
             nextCursorElement,
-            totalCount,
+            new InternalPaginatorHelper.EmptyNextPageStateAsync(totalCount, HasPreviousPageFuncAsync),
             hasNextPage,
             computeNextPage);
 
@@ -217,7 +239,8 @@ public static class KeySetPaginator
             hasNextPage,
             totalCount,
             nextPageAsyncFunc,
-            nextCursorElement == null ? default : strategy.CreateCursor(nextCursorElement));
+            nextCursorElement == null ? default : strategy.CreateCursor(nextCursorElement),
+            HasPreviousPageFuncAsync);
     }
 
     /// <summary>
@@ -228,7 +251,8 @@ public static class KeySetPaginator
     /// <param name="strategy">The KeySet pagination strategy to use for pagination.</param>
     /// <param name="queryable">The <see cref="IQueryable{T}"/> to paginate</param>
     /// <param name="asyncMaterializationFunc">The function to use to perform async materialization of the <see cref="IQueryable{T}"/></param>
-    /// <param name="asyncCountFunc">The function to use to perform async counting of the <see cref="IQueryable{T}"/></param>
+    /// <param name="asyncCountFunc">The function to use to perform async counting of the <see cref="IQueryable{T}"/>.</param>
+    /// <param name="asyncAnyFunc">The function to use to asynchronously determine if the <see cref="IQueryable{T}"/> contains any elements.</param>
     /// <param name="afterCursor">The cursor to use as the starting point for the pagination. To retrieve the first page, pass in <see langword="null"/>.</param>
     /// <param name="pageSize">The size of the page.</param>
     /// <param name="computeNextPage">Controls whether each page should check if a next page exists.</param>
@@ -243,6 +267,7 @@ public static class KeySetPaginator
     /// <code>
     /// asyncMaterializationFunc: (queryable, cancellationToken) => queryable.ToListAsync(cancellationToken)
     /// asyncCountFunc: (queryable, cancellationToken) => queryable.CountAsync(cancellationToken)
+    /// asyncAnyFunc: (queryable, cancellationToken) => queryable.AnyAsync(cancellationToken)
     /// </code>
     /// </para> 
     /// </remarks>
@@ -250,7 +275,8 @@ public static class KeySetPaginator
         IKeySetPaginationStrategy<T, TCursor> strategy,
         IQueryable<T> queryable,
         ToListAsync<T> asyncMaterializationFunc,
-        CountAsync<T>? asyncCountFunc,
+        CountAsync<T> asyncCountFunc,
+        AnyAsync<T> asyncAnyFunc,
         TCursor? afterCursor,
         int pageSize,
         ComputeNextPage computeNextPage = ComputeNextPage.EveryPage,
@@ -264,6 +290,7 @@ public static class KeySetPaginator
             queryable: queryable,
             asyncMaterializationFunc: asyncMaterializationFunc,
             asyncCountFunc: asyncCountFunc,
+            asyncAnyFunc: asyncAnyFunc,
             afterCursor: afterCursor,
             pageSize: pageSize,
             computeNextPage: computeNextPage,
@@ -282,7 +309,8 @@ public static class KeySetPaginator
     /// <param name="strategy">The KeySet pagination strategy to use for pagination.</param>
     /// <param name="queryable">The <see cref="IQueryable{T}"/> to paginate</param>
     /// <param name="asyncMaterializationFunc">The function to use to perform async materialization of the <see cref="IQueryable{T}"/></param>
-    /// <param name="asyncCountFunc">The function to use to perform async counting of the <see cref="IQueryable{T}"/></param>
+    /// <param name="asyncCountFunc">The function to use to perform async counting of the <see cref="IQueryable{T}"/>.</param>
+    /// <param name="asyncAnyFunc">The function to use to asynchronously determine if the <see cref="IQueryable{T}"/> contains any elements.</param>
     /// <param name="afterCursorString">The opaque cursor string to use as the starting point for the pagination. To retrieve the first page, pass in <see langword="null"/>.</param>
     /// <param name="pageSize">The size of the page.</param>
     /// <param name="computeNextPage">Controls whether each page should check if a next page exists.</param>
@@ -297,6 +325,7 @@ public static class KeySetPaginator
     /// <code>
     /// asyncMaterializationFunc: (queryable, cancellationToken) => queryable.ToListAsync(cancellationToken)
     /// asyncCountFunc: (queryable, cancellationToken) => queryable.CountAsync(cancellationToken)
+    /// asyncAnyFunc: (queryable, cancellationToken) => queryable.AnyAsync(cancellationToken)
     /// </code>
     /// </para> 
     /// </remarks>
@@ -304,7 +333,8 @@ public static class KeySetPaginator
         TStrategy strategy,
         IQueryable<T> queryable,
         ToListAsync<T> asyncMaterializationFunc,
-        CountAsync<T>? asyncCountFunc,
+        CountAsync<T> asyncCountFunc,
+        AnyAsync<T> asyncAnyFunc,
         string? afterCursorString,
         int pageSize,
         ComputeNextPage computeNextPage = ComputeNextPage.EveryPage,
@@ -321,6 +351,7 @@ public static class KeySetPaginator
             queryable: queryable,
             asyncMaterializationFunc: asyncMaterializationFunc,
             asyncCountFunc: asyncCountFunc,
+            asyncAnyFunc: asyncAnyFunc,
             afterCursor: cursor,
             pageSize: pageSize,
             computeNextPage: computeNextPage,

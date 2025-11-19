@@ -28,6 +28,18 @@ public delegate Task<List<T>> ToListAsync<T>(IQueryable<T> paginatedQueryable, C
 /// </remarks>
 public delegate Task<int> CountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken);
 
+/// <summary>
+/// Method used to asynchronously determine whether a <see cref="IQueryable{T}"/> contains any elements.
+/// </summary>
+/// <returns>Returns true if any elements exist.</returns>
+/// <remarks>
+/// If using EFCore for async operations you can create this async any method like so:
+/// <code>
+/// (queryable, cancellationToken) => queryable.AnyAsync(cancellationToken)
+/// </code>
+/// </remarks>
+public delegate Task<bool> AnyAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken);
+
 internal delegate PageResult<T, TCursor> NextPage<T, TCursor>() where TCursor : ICursor;
 
 internal delegate Task<PageResultAsync<T, TCursor>> NextPageAsync<T, TCursor>(CancellationToken cancellationToken) where TCursor : ICursor;

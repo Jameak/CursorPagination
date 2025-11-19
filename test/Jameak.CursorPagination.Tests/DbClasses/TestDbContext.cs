@@ -1,7 +1,7 @@
 using Jameak.CursorPagination.Tests.InputClasses;
 using Microsoft.EntityFrameworkCore;
 
-namespace Jameak.CursorPagination.Tests.DbTests;
+namespace Jameak.CursorPagination.Tests.DbClasses;
 public class TestDbContext : DbContext
 {
     private readonly List<string> _logMessages = [];

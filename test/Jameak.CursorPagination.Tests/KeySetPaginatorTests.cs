@@ -3,7 +3,7 @@ using Jameak.CursorPagination.Abstractions.Enums;
 using Jameak.CursorPagination.Abstractions.KeySetPagination;
 using Jameak.CursorPagination.Enums;
 using Jameak.CursorPagination.Page;
-using Jameak.CursorPagination.Tests.DbTests;
+using Jameak.CursorPagination.Tests.DbClasses;
 using Jameak.CursorPagination.Tests.InputClasses;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,16 +57,18 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
         var firstPageWithNotConstantNext = await KeySetPaginator.ApplyPaginationAsync(
             strategy,
             data.AsQueryable(),
-            asyncMaterializationFunc: (queryable, token) => Task.FromResult(queryable.ToList()),
-            asyncCountFunc: null,
+            asyncMaterializationFunc: (queryable, _) => AsyncDelegates.SyncToList(queryable),
+            asyncCountFunc: (queryable, _) => AsyncDelegates.SyncCount(queryable),
+            asyncAnyFunc: (queryable, _) => AsyncDelegates.SyncAny(queryable),
             afterCursor: null,
             pageSize: 3,
             computeNextPage: ComputeNextPage.EveryPage);
         var firstPageWithConstantNext = await KeySetPaginator.ApplyPaginationAsync(
             strategy,
             data.AsQueryable(),
-            asyncMaterializationFunc: (queryable, token) => Task.FromResult(queryable.ToList()),
-            asyncCountFunc: null,
+            asyncMaterializationFunc: (queryable, _) => AsyncDelegates.SyncToList(queryable),
+            asyncCountFunc: (queryable, _) => AsyncDelegates.SyncCount(queryable),
+            asyncAnyFunc: (queryable, _) => AsyncDelegates.SyncAny(queryable),
             afterCursor: null,
             pageSize: 3,
             computeNextPage: ComputeNextPage.EveryPageAndPreventNextPageQueryOnLastPage);
@@ -78,24 +80,6 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
         data.Add(new SimplePropertyPoco { IntProp = 999, StringProp = "x" });
         Assert.False((await firstPageWithNotConstantNext.NextPageAsync()).IsEmpty, "When underlying data changes, query with non-constant next page checks to see if new data has arrived.");
         Assert.True((await firstPageWithConstantNext.NextPageAsync()).IsEmpty, "When underlying data changes, query with constant next page does not re-run the query.");
-    }
-
-    [Fact]
-    public async Task AsyncWithTotalCountTrueMustEnforceNonNullCountMethod()
-    {
-        var strategy = new SimplePropertyKeySetStrategy();
-        var data = TestHelper.CreateSimplePropertyPocoData();
-
-        // Act
-        await Assert.ThrowsAsync<ArgumentException>(() => KeySetPaginator.ApplyPaginationAsync(
-            strategy,
-            data.AsQueryable(),
-            asyncMaterializationFunc: (queryable, token) => Task.FromResult(queryable.ToList()),
-            asyncCountFunc: null,
-            afterCursor: null,
-            pageSize: 3,
-            computeNextPage: ComputeNextPage.Never,
-            computeTotalCount: ComputeTotalCount.Once));
     }
 
     [Fact]
@@ -133,8 +117,9 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
         var firstPage = await KeySetPaginator.ApplyPaginationAsync(
             strategy,
             data.AsQueryable(),
-            asyncMaterializationFunc: (queryable, token) => Task.FromResult(queryable.ToList()),
-            asyncCountFunc: null,
+            asyncMaterializationFunc: (queryable, _) => AsyncDelegates.SyncToList(queryable),
+            asyncCountFunc: (queryable, _) => AsyncDelegates.SyncCount(queryable),
+            asyncAnyFunc: (queryable, _) => AsyncDelegates.SyncAny(queryable),
             afterCursor: null,
             pageSize: 3,
             computeNextPage: ComputeNextPage.Never,
@@ -191,9 +176,10 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
         // Act
         var firstPage = await KeySetPaginator.ApplyPaginationAsync(
             strategy,
-            TestHelper.TaggedTestTable(dbContext),
-            asyncMaterializationFunc: (queryable, token) => Task.FromResult(queryable.ToList()),
-            asyncCountFunc: (queryable, token) => Task.FromResult(queryable.Count()),
+            TestHelper.TagTestQueryable(dbContext.SimplePropertyTestTable),
+            asyncMaterializationFunc: (queryable, _) => AsyncDelegates.SyncToList(queryable),
+            asyncCountFunc: (queryable, _) => AsyncDelegates.SyncCount(queryable),
+            asyncAnyFunc: (queryable, _) => AsyncDelegates.SyncAny(queryable),
             afterCursor: null,
             pageSize: 3,
             computeNextPage: ComputeNextPage.EveryPageAndPreventNextPageQueryOnLastPage,
@@ -205,6 +191,7 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
         // Assert
         var results = new LinkedList<RowData<SimplePropertyPoco, SimplePropertyKeySetStrategy.Cursor>>();
         var nextPageResults = new List<bool>();
+        var previousPageResults = new List<bool>();
         await foreach (var page in pages)
         {
             Assert.True(page.TotalCount.HasValue);
@@ -212,6 +199,7 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
 
             Assert.True(page.HasNextPage.HasValue);
             nextPageResults.Add(page.HasNextPage.Value);
+            previousPageResults.Add(await page.HasPreviousPageAsync());
 
             TestHelper.CombinePageHelper(results, page.Items, direction);
             Assert.Equal(TestHelper.GetExpectedNextCursor(page.Items, direction), page.NextCursor);
@@ -219,6 +207,8 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
 
         Assert.True(nextPageResults.Take(nextPageResults.Count - 1).All(b => b), "All pages except last page, should indicate that a next page exists.");
         Assert.False(nextPageResults.Skip(nextPageResults.Count - 1).All(b => b), "Last page should indicate that no next page exists.");
+        Assert.True(previousPageResults.Skip(1).All(b => b), "All pages except first page, should indicate that a previous page exists.");
+        Assert.False(previousPageResults.First(), "First page should indicate that no previous page exists.");
 
         // Always forward direction, as the CombinePageHelper combines each page to the forward-direction equivalent.
         Assert.Equal(SimplePropertyKeySetStrategyTestHelper.ApplyExpectedCorrectOrderForwardDirection(dbContext.SimplePropertyTestTable), results.Select(e => e.Data));
@@ -252,6 +242,7 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
         // Assert
         var results = new LinkedList<RowData<T, TCursor>>();
         var nextPageResults = new List<bool>();
+        var previousPageResults = new List<bool>();
         foreach (var page in pages)
         {
             Assert.True(page.TotalCount.HasValue);
@@ -259,6 +250,7 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
 
             Assert.True(page.HasNextPage.HasValue);
             nextPageResults.Add(page.HasNextPage.Value);
+            previousPageResults.Add(page.HasPreviousPage());
 
             TestHelper.CombinePageHelper(results, page.Items, direction);
             Assert.Equal(TestHelper.GetExpectedNextCursor(page.Items, direction), page.NextCursor);
@@ -266,9 +258,61 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
 
         Assert.True(nextPageResults.Take(nextPageResults.Count - 1).All(b => b), "All pages except last page, should indicate that a next page exists.");
         Assert.False(nextPageResults.Skip(nextPageResults.Count - 1).All(b => b), "Last page should indicate that no next page exists.");
+        Assert.True(previousPageResults.Skip(1).All(b => b), "All pages except first page, should indicate that a previous page exists.");
+        Assert.False(previousPageResults.First(), "First page should indicate that no previous page exists.");
 
         // Always forward direction, as the CombinePageHelper combines each page to the forward-direction equivalent.
         Assert.Equal(expectedOrder(dbContext), results.Select(e => e.Data));
         return Verify(TestHelper.TaggedLogMessages(dbContext), TestHelper.CreateVerifierSettings(direction, computeTotal));
+    }
+
+    [Fact]
+    public void HasPreviousPage_ForEmptyLastPage_WithDataInTable_ReturnsTrue()
+    {
+        var dbContext = _databaseFactory.CreateDbContext();
+        var emptyPage = GetLastEmptyPage(dbContext.SimplePropertyTestTable);
+        Assert.True(emptyPage.HasPreviousPage());
+    }
+
+    [Fact]
+    public void HasPreviousPage_ForEmptyLastPage_WithEmptyTable_ReturnsFalse()
+    {
+        var emptyDataSet = new List<SimplePropertyPoco>();
+        var emptyPage = GetLastEmptyPage(emptyDataSet.AsQueryable());
+        Assert.False(emptyPage.HasPreviousPage());
+    }
+
+    [Fact]
+    public void HasPreviousPage_ForEmptyLastPage_WithTableThatIsNowEmpty_ReturnsFalse()
+    {
+        // KeySet pagination works by querying the dataset for previous data, which means that if the dataset changes, the method result also changes.
+        var dataSet = TestHelper.CreateSimplePropertyPocoData();
+        var emptyPage = GetLastEmptyPage(dataSet.AsQueryable());
+        Assert.True(emptyPage.HasPreviousPage());
+        dataSet.Clear();
+        Assert.False(emptyPage.HasPreviousPage());
+    }
+
+    private static PageResult<SimplePropertyPoco, SimplePropertyKeySetStrategy.Cursor> GetLastEmptyPage(IQueryable<SimplePropertyPoco> dataSet)
+    {
+        var strategy = new SimplePropertyKeySetStrategy();
+
+        // Act
+        var currentPage = KeySetPaginator.ApplyPagination(
+            strategy,
+            dataSet,
+            afterCursor: null,
+            pageSize: 3,
+            computeNextPage: ComputeNextPage.EveryPageAndPreventNextPageQueryOnLastPage,
+            computeTotalCount: ComputeTotalCount.Never,
+            paginationDirection: PaginationDirection.Forward);
+
+        while (!currentPage.IsEmpty)
+        {
+            currentPage = currentPage.NextPage();
+        }
+
+        Assert.True(currentPage.IsEmpty);
+        return currentPage;
     }
 }

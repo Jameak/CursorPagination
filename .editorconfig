@@ -53,6 +53,7 @@ generated_code = true
 
 # C# files
 [*.cs]
+
 # New line preferences
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true

@@ -68,7 +68,13 @@ function RunLinterAndStandardTests{
          [string] $AdditionalConfiguration
     )
     
-    Exec { & dotnet format --verify-no-changes }
+    if ($Env -eq 'ci') {
+        Exec { & dotnet format style --verify-no-changes }
+        Exec { & dotnet format analyzers --verify-no-changes }
+    } else {
+        Exec { & dotnet format --verify-no-changes }
+    }
+
     Exec { & dotnet build -c $Configuration $AdditionalConfiguration  '/p:ExtraNoWarn1="JAMCP0007"' '/p:ExtraNoWarn2="JAMCP0018"' }
     Exec { & dotnet test -c $Configuration $AdditionalConfiguration --logger trx --no-build --no-restore }
 }
