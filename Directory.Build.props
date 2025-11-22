@@ -6,6 +6,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/Jameak/CursorPagination</PackageProjectUrl>
         <PackageTags>cursor paginate pagination keyset offset skip source generator queryable</PackageTags>
+        <PackageDescription>An easy-to-use efficient KeySet- and Offset-pagination implementation for IQueryable with included opaque Cursor support.</PackageDescription>
         <VersionPrefix>1.0.0</VersionPrefix>
         <VersionSuffix></VersionSuffix>
         <PackageVersion Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</PackageVersion>
