@@ -44,11 +44,11 @@ jobs:
         with:
           name: release-pack-nupkg
           path: artifacts
-      #- name: Run nuget package validation
-      #  run: |
-      #    foreach($file in (Get-ChildItem "./artifacts/" -Recurse -Include *.nupkg)) {
-      #        dotnet meziantou.validate-nuget-package $file
-      #    }
+      - name: Run nuget package validation
+        run: |
+          foreach($file in (Get-ChildItem "./artifacts/" -Recurse -Include *.nupkg)) {
+              dotnet meziantou.validate-nuget-package $file
+          }
       
   publish-to-nuget-and-gh-release:
     # Publish only when creating a github release
@@ -72,11 +72,11 @@ jobs:
         id: login
         with:
           user: ${{ secrets.NUGET_USER }}
-      #- name: Upload nupkg to nuget
-      #  run: |
-      #    foreach($file in (Get-ChildItem "./artifacts/" -Recurse -Include *.nupkg)) {
-      #        dotnet nuget push $file --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
-      #    }
+      - name: Upload nupkg to nuget
+        run: |
+          foreach($file in (Get-ChildItem "./artifacts/" -Recurse -Include *.nupkg)) {
+              dotnet nuget push $file --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
       - name: Upload nupkg to github release
         run: |
           foreach($file in (Get-ChildItem "./artifacts/" -Recurse -Include *.nupkg)) {

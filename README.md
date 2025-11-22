@@ -68,7 +68,7 @@ var firstPage = KeySetPaginator.ApplyPagination(
 
 For Offset pagination, use `OffsetPaginator` instead.
 
-### Retrieving the cursor pointing to the next page
+### Retrieving the cursor pointing to the next page as an opaque string
 Each returned page-object includes a helper that exposes the cursor used to retrieve the next page.
 
 #### KeySet pagination

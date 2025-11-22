@@ -1,4 +1,4 @@
-using CsCheck;
+﻿using CsCheck;
 using Jameak.CursorPagination.SourceGenerator.IntegrationTests.InputClasses;
 using Jameak.CursorPagination.SourceGenerator.IntegrationTests.PartialStrategies;
 
@@ -24,7 +24,7 @@ public class KeySetCursorSerializationTests
             LongProp = -7,
             SbyteProp = 8,
             ShortProp = 9,
-            StringProp = "abc",
+            StringProp = "abc😊",
             UintProp = 10,
             UlongProp = 11,
             UshortProp = 12,
@@ -38,7 +38,7 @@ public class KeySetCursorSerializationTests
         var deserializedCursor = strategy.CursorFromString(cursorString);
 
         // Assert
-        Assert.Equal("eyIwIjpmYWxzZSwiMSI6MiwiMiI6IjYzODcxMzgzODQ1MDA2MDAwMDpVVEMiLCIzIjoiMjAyNC0wMS0wMlQwMzowNDowNS4wMDYrMDA6MDAiLCI0IjozLCI1Ijo0LjEsIjYiOjUuMiwiNyI6ImFhYWFhYWFhLWFhYWEtYWFhYS1hYWFhLWFhYWFhYWFhYWFhYSIsIjgiOi02LCI5IjotNywiMTAiOjgsIjExIjo5LCIxMiI6ImFiYyIsIjEzIjoxMiwiMTQiOjEwLCIxNSI6MTEsIjE2IjpudWxsfQ",
+        Assert.Equal("eyIwIjpmYWxzZSwiMSI6MiwiMiI6IjYzODcxMzgzODQ1MDA2MDAwMDpVVEMiLCIzIjoiMjAyNC0wMS0wMlQwMzowNDowNS4wMDYrMDA6MDAiLCI0IjozLCI1Ijo0LjEsIjYiOjUuMiwiNyI6ImFhYWFhYWFhLWFhYWEtYWFhYS1hYWFhLWFhYWFhYWFhYWFhYSIsIjgiOi02LCI5IjotNywiMTAiOjgsIjExIjo5LCIxMiI6ImFiY1x1RDgzRFx1REUwQSIsIjEzIjoxMiwiMTQiOjEwLCIxNSI6MTEsIjE2IjpudWxsfQ",
             cursorString);
         Assert.Equal(cursor, deserializedCursor);
     }
