@@ -144,8 +144,6 @@ public static class InternalProcessingHelper
         }
     }
 
-    private static readonly char[] s_base64Padding = ['='];
-
     /// <summary>
     /// This is an internal API that supports the library infrastructure
     /// and not subject to the same compatibility standards as public APIs.
@@ -153,7 +151,41 @@ public static class InternalProcessingHelper
     /// </summary>
     public static string UrlSafeBase64Encode(string toEncode)
     {
-        return Convert.ToBase64String(Encoding.UTF8.GetBytes(toEncode)).TrimEnd(s_base64Padding).Replace('+', '-').Replace('/', '_');
+        // Based on https://github.com/dotnet/aspnetcore/blob/main/src/Shared/WebEncoders/WebEncoders.cs which is MIT licensed.
+        // Reworked for .NET Standard 2.0
+        var bytesToEncode = Encoding.UTF8.GetBytes(toEncode);
+        var outputBuffer = new char[GetArraySizeRequiredToEncode(bytesToEncode.Length)];
+        var numBase64Chars = Convert.ToBase64CharArray(bytesToEncode, 0, bytesToEncode.Length, outputBuffer, 0);
+
+        for (var i = 0; i < numBase64Chars; i++)
+        {
+            var ch = outputBuffer[i];
+            switch (ch)
+            {
+                case '+':
+                    outputBuffer[i] = '-';
+                    break;
+                case '/':
+                    outputBuffer[i] = '_';
+                    break;
+                case '=':
+                    // We've reached a padding character; truncate the remainder.
+                    return CreateString(outputBuffer, i);
+            }
+        }
+
+        return CreateString(outputBuffer, numBase64Chars);
+
+        static string CreateString(char[] outputBuffer, int length)
+        {
+            return new string(outputBuffer, startIndex: 0, length: length);
+        }
+
+        static int GetArraySizeRequiredToEncode(int count)
+        {
+            var numWholeOrPartialInputBlocks = checked(count + 2) / 3;
+            return checked(numWholeOrPartialInputBlocks * 4);
+        }
     }
 
     /// <summary>
@@ -163,15 +195,83 @@ public static class InternalProcessingHelper
     /// </summary>
     public static string UrlSafeBase64Decode(string toDecode)
     {
-        // Copied from https://stackoverflow.com/a/26354677
-        // License - CC BY-SA 3.0
-        var incoming = toDecode.Replace('_', '/').Replace('-', '+');
-        switch (toDecode.Length % 4)
+        // Based on https://github.com/dotnet/aspnetcore/blob/main/src/Shared/WebEncoders/WebEncoders.cs which is MIT licensed.
+        // Reworked for .NET Standard 2.0
+        var paddingCharsToAdd = GetNumBase64PaddingCharsToAddForDecode(toDecode.Length);
+        var buffer = new char[checked(toDecode.Length + paddingCharsToAdd)];
+
+        var i = 0;
+        for (var j = 0; i < toDecode.Length; i++, j++)
         {
-            case 2: incoming += "=="; break;
-            case 3: incoming += "="; break;
+            var ch = toDecode[j];
+            switch (ch)
+            {
+                case '-':
+                    buffer[i] = '+';
+                    break;
+                case '_':
+                    buffer[i] = '/';
+                    break;
+                default:
+                    buffer[i] = ch;
+                    break;
+            }
         }
-        var bytes = Convert.FromBase64String(incoming);
-        return Encoding.ASCII.GetString(bytes);
+
+        for (; i < toDecode.Length + paddingCharsToAdd; i++)
+        {
+            buffer[i] = '=';
+        }
+
+        return Encoding.UTF8.GetString(Convert.FromBase64CharArray(buffer, 0, buffer.Length));
+
+        static int GetNumBase64PaddingCharsToAddForDecode(int inputLength)
+        {
+            return (inputLength % 4) switch
+            {
+                2 => 2,
+                3 => 1,
+                _ => 0,
+            };
+        }
+    }
+
+    /// <summary>
+    /// This is an internal API that supports the library infrastructure
+    /// and not subject to the same compatibility standards as public APIs.
+    /// It may be changed or removed without notice in any release.
+    /// </summary>
+    public static (
+        Func<IQueryable<T>, IOrderedQueryable<T>> applyOrderExpr,
+        Func<IQueryable<T>, IQueryable<T>> applySkip,
+        Func<IQueryable<T>, IQueryable<T>> applyTake)
+        OffsetBuildPaginationMethods<T>(
+        int pageSize,
+        bool checkHasNextPage,
+        Func<IQueryable<T>, IOrderedQueryable<T>> orderFunc,
+        OffsetCursor? cursor)
+    {
+        ThrowIfPageSizeInvalid(pageSize, checkHasNextPage);
+
+        Func<IQueryable<T>, IQueryable<T>> skipFunc;
+        if (cursor != null)
+        {
+            var skipValue = cursor.Skip;
+            skipFunc = queryable => queryable.Skip(skipValue);
+        }
+        else
+        {
+            skipFunc = queryable => queryable;
+        }
+
+        var toTake = pageSize;
+        if (checkHasNextPage)
+        {
+            toTake = ComputeToTake(pageSize);
+        }
+
+        IQueryable<T> TakeFunc(IQueryable<T> queryable) => queryable.Take(toTake);
+
+        return (orderFunc, skipFunc, TakeFunc);
     }
 }

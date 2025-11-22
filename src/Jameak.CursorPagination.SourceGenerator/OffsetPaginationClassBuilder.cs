@@ -64,32 +64,14 @@ internal class OffsetPaginationClassBuilder
         global::{{typeof(PaginationDirection).FullName}} paginationDirection,
         global::{{typeof(OffsetCursor).FullName}}? cursor)
     {
-        global::{{typeof(InternalProcessingHelper).FullName}}.{{nameof(InternalProcessingHelper.ThrowIfPageSizeInvalid)}}(pageSize, checkHasNextPage);
-
         global::System.Func<global::System.Linq.IQueryable<{{TargetClassTypePlaceholder}}>, global::System.Linq.IOrderedQueryable<{{TargetClassTypePlaceholder}}>> orderFunc =
             queryable => {{PrivateHelperClassName}}.ApplyOrderBy(queryable, paginationDirection);
-
-        global::System.Func<global::System.Linq.IQueryable<{{TargetClassTypePlaceholder}}>, global::System.Linq.IQueryable<{{TargetClassTypePlaceholder}}>> skipFunc;
-        if(cursor != null)
-        {
-            var skipValue = cursor.{{nameof(OffsetCursor.Skip)}};
-            skipFunc = queryable => global::System.Linq.Queryable.Skip(queryable, skipValue);
-        }
-        else
-        {
-            skipFunc = queryable => queryable;
-        }
-
-        var toTake = pageSize;
-        if(checkHasNextPage)
-        {
-            toTake = {{PrivateHelperClassName}}.ComputeToTake(pageSize);
-        }
-
-        global::System.Func<global::System.Linq.IQueryable<{{TargetClassTypePlaceholder}}>, global::System.Linq.IQueryable<{{TargetClassTypePlaceholder}}>> takeFunc =
-            queryable => global::System.Linq.Queryable.Take(queryable, toTake);
-
-        return (orderFunc, skipFunc, takeFunc);
+        
+        return {{typeof(InternalProcessingHelper).FullName}}.{{nameof(InternalProcessingHelper.OffsetBuildPaginationMethods)}}(
+            pageSize,
+            checkHasNextPage,
+            orderFunc,
+            cursor);
     }
 
     /// <inheritdoc />

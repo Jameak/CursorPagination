@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Basic.Reference.Assemblies;
@@ -38,6 +39,9 @@ public static class TestHelper
             // Jameak.CursorPagination.Abstractions
             MetadataReference.CreateFromFile(typeof(IKeySetCursor).Assembly.Location)
             ];
+
+        // Compilation errors are localized, so to ensure snapshot reproducibility we force a consistent culture.
+        using var cultureScope = new ChangeCultureScope("en-US");
 
         var compileOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             .WithNullableContextOptions(NullableContextOptions.Enable)
@@ -204,6 +208,27 @@ public static class TestHelper
                     Visit(fieldValue);
                 }
             }
+        }
+    }
+
+    private class ChangeCultureScope : IDisposable
+    {
+        private readonly CultureInfo _originalCurrentCulture;
+        private readonly CultureInfo _originalCurrentUiCulture;
+
+        public ChangeCultureScope(string cultureName)
+        {
+            _originalCurrentCulture = CultureInfo.CurrentCulture;
+            _originalCurrentUiCulture = CultureInfo.CurrentUICulture;
+            var culture = CultureInfo.GetCultureInfo(cultureName);
+            CultureInfo.CurrentCulture = culture;
+            CultureInfo.CurrentUICulture = culture;
+        }
+
+        public void Dispose()
+        {
+            CultureInfo.CurrentCulture = _originalCurrentCulture;
+            CultureInfo.CurrentUICulture = _originalCurrentUiCulture;
         }
     }
 }

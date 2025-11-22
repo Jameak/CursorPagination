@@ -45,32 +45,14 @@ public partial class OffsetPaginationStrategy : global::Jameak.CursorPagination.
         global::Jameak.CursorPagination.Abstractions.Enums.PaginationDirection paginationDirection,
         global::Jameak.CursorPagination.Abstractions.OffsetPagination.OffsetCursor? cursor)
     {
-        global::Jameak.CursorPagination.Abstractions.Internal.InternalProcessingHelper.ThrowIfPageSizeInvalid(pageSize, checkHasNextPage);
-
         global::System.Func<global::System.Linq.IQueryable<global::Jameak.CursorPagination.Sample.ResponseModels.DtoTypeToPaginate>, global::System.Linq.IOrderedQueryable<global::Jameak.CursorPagination.Sample.ResponseModels.DtoTypeToPaginate>> orderFunc =
             queryable => PrivateHelper.ApplyOrderBy(queryable, paginationDirection);
-
-        global::System.Func<global::System.Linq.IQueryable<global::Jameak.CursorPagination.Sample.ResponseModels.DtoTypeToPaginate>, global::System.Linq.IQueryable<global::Jameak.CursorPagination.Sample.ResponseModels.DtoTypeToPaginate>> skipFunc;
-        if(cursor != null)
-        {
-            var skipValue = cursor.Skip;
-            skipFunc = queryable => global::System.Linq.Queryable.Skip(queryable, skipValue);
-        }
-        else
-        {
-            skipFunc = queryable => queryable;
-        }
-
-        var toTake = pageSize;
-        if(checkHasNextPage)
-        {
-            toTake = PrivateHelper.ComputeToTake(pageSize);
-        }
-
-        global::System.Func<global::System.Linq.IQueryable<global::Jameak.CursorPagination.Sample.ResponseModels.DtoTypeToPaginate>, global::System.Linq.IQueryable<global::Jameak.CursorPagination.Sample.ResponseModels.DtoTypeToPaginate>> takeFunc =
-            queryable => global::System.Linq.Queryable.Take(queryable, toTake);
-
-        return (orderFunc, skipFunc, takeFunc);
+        
+        return Jameak.CursorPagination.Abstractions.Internal.InternalProcessingHelper.OffsetBuildPaginationMethods(
+            pageSize,
+            checkHasNextPage,
+            orderFunc,
+            cursor);
     }
 
     /// <inheritdoc />

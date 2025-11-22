@@ -46,32 +46,14 @@ public partial class TestOffsetPaginationStrategy : global::Jameak.CursorPaginat
         global::Jameak.CursorPagination.Abstractions.Enums.PaginationDirection paginationDirection,
         global::Jameak.CursorPagination.Abstractions.OffsetPagination.OffsetCursor? cursor)
     {
-        global::Jameak.CursorPagination.Abstractions.Internal.InternalProcessingHelper.ThrowIfPageSizeInvalid(pageSize, checkHasNextPage);
-
         global::System.Func<global::System.Linq.IQueryable<global::TestNamespace.TestInput>, global::System.Linq.IOrderedQueryable<global::TestNamespace.TestInput>> orderFunc =
             queryable => PrivateHelper.ApplyOrderBy(queryable, paginationDirection);
-
-        global::System.Func<global::System.Linq.IQueryable<global::TestNamespace.TestInput>, global::System.Linq.IQueryable<global::TestNamespace.TestInput>> skipFunc;
-        if(cursor != null)
-        {
-            var skipValue = cursor.Skip;
-            skipFunc = queryable => global::System.Linq.Queryable.Skip(queryable, skipValue);
-        }
-        else
-        {
-            skipFunc = queryable => queryable;
-        }
-
-        var toTake = pageSize;
-        if(checkHasNextPage)
-        {
-            toTake = PrivateHelper.ComputeToTake(pageSize);
-        }
-
-        global::System.Func<global::System.Linq.IQueryable<global::TestNamespace.TestInput>, global::System.Linq.IQueryable<global::TestNamespace.TestInput>> takeFunc =
-            queryable => global::System.Linq.Queryable.Take(queryable, toTake);
-
-        return (orderFunc, skipFunc, takeFunc);
+        
+        return Jameak.CursorPagination.Abstractions.Internal.InternalProcessingHelper.OffsetBuildPaginationMethods(
+            pageSize,
+            checkHasNextPage,
+            orderFunc,
+            cursor);
     }
 
     /// <inheritdoc />
