@@ -1,0 +1,64 @@
+﻿{
+  target: {
+    Diagnostics: [
+      {
+        Location: : (10,23)-(10,41),
+        Message: Property 'Nested.NullableNested.ValueTypeNested.NullableValueTypeNested.Value.StringProp' is nullable type 'TestNamespace.Level5?'. This will likely work if your ORM behaves but is not generally supported by this library. It is recommended that you instead create a non-nullable computed property or add a null-coalesce expression to the PaginationPropertyAttribute for this property.,
+        Severity: Warning,
+        WarningLevel: 1,
+        Descriptor: {
+          Id: JAMCP0007,
+          Title: Configured pagination property is nullable,
+          MessageFormat: Property '{0}' is nullable type '{1}'. This will likely work if your ORM behaves but is not generally supported by this library. It is recommended that you instead create a non-nullable computed property or add a null-coalesce expression to the PaginationPropertyAttribute for this property.,
+          Category: Usage,
+          DefaultSeverity: Warning,
+          IsEnabledByDefault: true
+        }
+      },
+      {
+        Location: : (10,23)-(10,41),
+        Message: Property 'Nested.NullableNested.ValueTypeNested.NullableValueTypeNested.Value.IntProp' is nullable type 'TestNamespace.Level5?'. This will likely work if your ORM behaves but is not generally supported by this library. It is recommended that you instead create a non-nullable computed property or add a null-coalesce expression to the PaginationPropertyAttribute for this property.,
+        Severity: Warning,
+        WarningLevel: 1,
+        Descriptor: {
+          Id: JAMCP0007,
+          Title: Configured pagination property is nullable,
+          MessageFormat: Property '{0}' is nullable type '{1}'. This will likely work if your ORM behaves but is not generally supported by this library. It is recommended that you instead create a non-nullable computed property or add a null-coalesce expression to the PaginationPropertyAttribute for this property.,
+          Category: Usage,
+          DefaultSeverity: Warning,
+          IsEnabledByDefault: true
+        }
+      },
+      {
+        Location: : (10,23)-(10,41),
+        Message: Property 'Nested.NullableNested.ValueTypeNested.NullableValueTypeNested.Value.StringProp' is nullable value type 'TestNamespace.Level5?'. This will likely work if no 'null' values exist in your data and your ORM behaves, but is not generally supported by this library. If a 'null'-value is ever encountered the Cursor-constructor will throw KeySetCursorNullValueException.,
+        Severity: Warning,
+        WarningLevel: 1,
+        Descriptor: {
+          Id: JAMCP0018,
+          Title: Configured KeySet pagination property is nullable value type,
+          MessageFormat: Property '{0}' is nullable value type '{1}'. This will likely work if no 'null' values exist in your data and your ORM behaves, but is not generally supported by this library. If a 'null'-value is ever encountered the Cursor-constructor will throw KeySetCursorNullValueException.,
+          Category: Usage,
+          DefaultSeverity: Warning,
+          IsEnabledByDefault: true
+        }
+      },
+      {
+        Location: : (10,23)-(10,41),
+        Message: Property 'Nested.NullableNested.ValueTypeNested.NullableValueTypeNested.Value.IntProp' is nullable value type 'TestNamespace.Level5?'. This will likely work if no 'null' values exist in your data and your ORM behaves, but is not generally supported by this library. If a 'null'-value is ever encountered the Cursor-constructor will throw KeySetCursorNullValueException.,
+        Severity: Warning,
+        WarningLevel: 1,
+        Descriptor: {
+          Id: JAMCP0018,
+          Title: Configured KeySet pagination property is nullable value type,
+          MessageFormat: Property '{0}' is nullable value type '{1}'. This will likely work if no 'null' values exist in your data and your ORM behaves, but is not generally supported by this library. If a 'null'-value is ever encountered the Cursor-constructor will throw KeySetCursorNullValueException.,
+          Category: Usage,
+          DefaultSeverity: Warning,
+          IsEnabledByDefault: true
+        }
+      }
+    ]
+  },
+  generated-code-can-compile: true,
+  generated-code-compilation-diagnostics: []
+}

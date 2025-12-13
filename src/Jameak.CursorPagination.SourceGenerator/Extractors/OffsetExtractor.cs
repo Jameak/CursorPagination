@@ -60,7 +60,7 @@ internal class OffsetExtractor : BaseExtractor
         if (propExtraction.properties.Count > 0)
         {
             return new ExtractedOffsetData(
-                generatorClassSymbol.Name,
+                generatorClassSymbol.ToNameWithGenericsAndEscapedKeywords(),
                 SanitizeToValidFilename(generatorClassSymbol.Name),
                 GetEnclosingNamespace(generatorClassSymbol),
                 GetAccessibility(generatorClassSymbol),

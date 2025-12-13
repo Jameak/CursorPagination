@@ -150,6 +150,70 @@ public static partial class TestHelper
         ];
     }
 
+    public static List<PocoWithNestedProperty> CreatePocoWithNestedPropertyData()
+    {
+
+        return
+        [
+            new()
+            {
+                IntProp = 1,
+                NestedData = new(){
+                    StringProp = "a",
+                    IntProp = 7
+                }
+            },
+            new()
+            {
+                IntProp = 2,
+                NestedData = new(){
+                    StringProp = "a",
+                    IntProp = 6
+                }
+            },
+            new()
+            {
+                IntProp = 3,
+                NestedData = new(){
+                    StringProp = "a",
+                    IntProp = 5
+                }
+            },
+            new()
+            {
+                IntProp = 4,
+                NestedData = new(){
+                    StringProp = "b",
+                    IntProp = 4
+                }
+            },
+            new()
+            {
+                IntProp = 5,
+                NestedData = new(){
+                    StringProp = "c",
+                    IntProp = 3
+                }
+            },
+            new()
+            {
+                IntProp = 6,
+                NestedData = new(){
+                    StringProp = "a",
+                    IntProp = 2
+                }
+            },
+            new()
+            {
+                IntProp = 7,
+                NestedData = new(){
+                    StringProp = "d",
+                    IntProp = 1
+                }
+            },
+        ];
+    }
+
     [GeneratedRegex(@"\(\d+ms\)")]
     private static partial Regex DurationLogRegex();
 }

@@ -18,6 +18,12 @@ CREATE TABLE "ComputedNullableTestTable" (
 );
 
 
+CREATE TABLE "NestedData" (
+    "IntProp" INTEGER NOT NULL CONSTRAINT "PK_NestedData" PRIMARY KEY AUTOINCREMENT,
+    "StringProp" TEXT NOT NULL
+);
+
+
 CREATE TABLE "NullableTestTable" (
     "PrimaryKeyInt" INTEGER NOT NULL CONSTRAINT "PK_NullableTestTable" PRIMARY KEY AUTOINCREMENT,
     "NullableIntProp" INTEGER NULL,
@@ -41,7 +47,17 @@ CREATE TABLE "SimplePropertyTestTable" (
 );
 
 
+CREATE TABLE "PocoWithNestedPropertyTestTable" (
+    "IntProp" INTEGER NOT NULL CONSTRAINT "PK_PocoWithNestedPropertyTestTable" PRIMARY KEY AUTOINCREMENT,
+    "NestedDataIntProp" INTEGER NOT NULL,
+    CONSTRAINT "FK_PocoWithNestedPropertyTestTable_NestedData_NestedDataIntProp" FOREIGN KEY ("NestedDataIntProp") REFERENCES "NestedData" ("IntProp") ON DELETE CASCADE
+);
+
+
 CREATE INDEX "IX_ComputedNullableTestTable_ComputedIntProp" ON "ComputedNullableTestTable" ("ComputedIntProp");
+
+
+CREATE INDEX "IX_PocoWithNestedPropertyTestTable_NestedDataIntProp" ON "PocoWithNestedPropertyTestTable" ("NestedDataIntProp");
 
 
 

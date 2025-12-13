@@ -39,7 +39,7 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([ValidPaginatedType, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([ValidPaginatedType, StrategyDecl]);
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([ValidPaginatedType, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([ValidPaginatedType, StrategyDecl]);
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public partial class TestPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([ValidPaginatedType, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([ValidPaginatedType, StrategyDecl]);
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([ValidPaginatedType, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([ValidPaginatedType, StrategyDecl]);
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([PaginatedTypeWithProtectedProperty, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([PaginatedTypeWithProtectedProperty, StrategyDecl]);
     }
 
     [Fact]
@@ -156,7 +156,7 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([PaginatedTypeWithProtectedField, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([PaginatedTypeWithProtectedField, StrategyDecl]);
     }
 
     [Fact]
@@ -185,7 +185,7 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([PaginatedTypeWithWriteOnlyProperty, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([PaginatedTypeWithWriteOnlyProperty, StrategyDecl]);
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([ValidPaginatedType, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([ValidPaginatedType, StrategyDecl]);
     }
 
     [Fact]
@@ -233,7 +233,7 @@ public class InternalStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedType, nonPartialStrategy]);
+        return TestHelper.VerifySourceGeneration([paginatedType, nonPartialStrategy]);
     }
 
     [Fact]
@@ -264,7 +264,7 @@ public class WrappingClass
 }
 """;
 
-        return TestHelper.Verify([paginatedType, nonPartialStrategy]);
+        return TestHelper.VerifySourceGeneration([paginatedType, nonPartialStrategy]);
     }
 
     [Fact]
@@ -292,7 +292,7 @@ public partial class TestStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedType, strategy]);
+        return TestHelper.VerifySourceGeneration([paginatedType, strategy]);
     }
 
     [Fact]
@@ -320,7 +320,7 @@ internal partial class TestStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedType, strategy]);
+        return TestHelper.VerifySourceGeneration([paginatedType, strategy]);
     }
 
     [Fact]
@@ -348,7 +348,7 @@ internal partial class TestStrategy<T>
 }
 """;
 
-        return TestHelper.Verify([paginatedType, strategy]);
+        return TestHelper.VerifySourceGeneration([paginatedType, strategy]);
     }
 
     [Fact]
@@ -368,6 +368,6 @@ internal partial class TestStrategy
 }
 """;
 
-        return TestHelper.Verify([strategy]);
+        return TestHelper.VerifySourceGeneration([strategy]);
     }
 }

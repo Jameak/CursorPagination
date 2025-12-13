@@ -29,7 +29,7 @@ public partial class TestOffsetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([s_paginatedType, strategyDefinition]);
+        return TestHelper.VerifySourceGeneration([s_paginatedType, strategyDefinition]);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public partial class TestOffsetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([s_paginatedType, strategyDefinition]);
+        return TestHelper.VerifySourceGeneration([s_paginatedType, strategyDefinition]);
     }
 
     [Fact]
@@ -71,6 +71,6 @@ public partial class TestOffsetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([s_paginatedType, strategyDefinition]);
+        return TestHelper.VerifySourceGeneration([s_paginatedType, strategyDefinition]);
     }
 }

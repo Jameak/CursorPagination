@@ -1,0 +1,4 @@
+﻿{
+  generated-code-can-compile: true,
+  generated-code-compilation-diagnostics: []
+}

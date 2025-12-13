@@ -26,7 +26,7 @@ public partial class TestStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedTypeWithReservedKeyword, strategyDefinition]);
+        return TestHelper.VerifySourceGeneration([paginatedTypeWithReservedKeyword, strategyDefinition]);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public partial class TestStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedTypeWithField, strategyDefinition]);
+        return TestHelper.VerifySourceGeneration([paginatedTypeWithField, strategyDefinition]);
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public partial class TestStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedTypeWithGetOnlyProp, strategyDefinition]);
+        return TestHelper.VerifySourceGeneration([paginatedTypeWithGetOnlyProp, strategyDefinition]);
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public partial class TestStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedType, strategyDefinitionOne, strategyDefinitionTwo]);
+        return TestHelper.VerifySourceGeneration([paginatedType, strategyDefinitionOne, strategyDefinitionTwo]);
     }
 
     [Fact]
@@ -164,7 +164,7 @@ internal partial class InternalStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedType, internalStrategy]);
+        return TestHelper.VerifySourceGeneration([paginatedType, internalStrategy]);
     }
 
     [Fact]
@@ -196,7 +196,7 @@ public partial class TestStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedType, paginationStrategy]);
+        return TestHelper.VerifySourceGeneration([paginatedType, paginationStrategy]);
     }
 
     [Fact]
@@ -223,7 +223,7 @@ public partial class TestStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedType, paginationStrategy]);
+        return TestHelper.VerifySourceGeneration([paginatedType, paginationStrategy]);
     }
 
     [Fact]
@@ -256,7 +256,7 @@ namespace TopLevel
 }
 """;
 
-        return TestHelper.Verify([paginatedType, nestedNsStrategy]);
+        return TestHelper.VerifySourceGeneration([paginatedType, nestedNsStrategy]);
     }
 
     [Fact]
@@ -284,6 +284,75 @@ internal partial class TestStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedType, strategy]);
+        return TestHelper.VerifySourceGeneration([paginatedType, strategy]);
+    }
+
+    [Fact]
+    public Task NameOfWithDifferentTypeCausesWarningDespiteNameBeingValidOnTargetType()
+    {
+        var paginatedType = """
+namespace TestNamespace;
+public class TestInput
+{
+    public required int IntProp { get; set; }
+}
+
+public class OtherInput
+{
+    public required int IntProp { get; set; }
+}
+""";
+
+        var strategy = $$"""
+using Jameak.CursorPagination.Abstractions.Attributes;
+using Jameak.CursorPagination.Abstractions.Enums;
+
+namespace TestNamespace;
+
+[KeySetPaginationStrategy(typeof(TestInput), KeySetCursorSerializerGeneration.DoNotGenerate)]
+[PaginationProperty(0, nameof(OtherInput.IntProp), PaginationOrdering.Ascending)]
+public partial class TestStrategy
+{
+
+}
+""";
+
+        return TestHelper.VerifySourceGeneration([paginatedType, strategy], diagnosticsOnly: true);
+    }
+
+    [Fact]
+    public Task NameOfWithDifferentTypeCausesWarningDespiteNameBeingValidOnTargetType_SameNameDifferentNamespace()
+    {
+        var testNamespaceType = """
+namespace TestNamespace;
+public class TestInput
+{
+    public required int IntProp { get; set; }
+}
+""";
+
+        var otherNamespaceType = """
+namespace OtherNamespace;
+public class TestInput
+{
+    public required int IntProp { get; set; }
+}
+""";
+
+        var strategy = $$"""
+using Jameak.CursorPagination.Abstractions.Attributes;
+using Jameak.CursorPagination.Abstractions.Enums;
+
+namespace SomeOtherNamespace;
+
+[KeySetPaginationStrategy(typeof(TestNamespace.TestInput), KeySetCursorSerializerGeneration.DoNotGenerate)]
+[PaginationProperty(0, nameof(OtherNamespace.TestInput.IntProp), PaginationOrdering.Ascending)]
+public partial class TestStrategy
+{
+
+}
+""";
+
+        return TestHelper.VerifySourceGeneration([testNamespaceType, otherNamespaceType, strategy], diagnosticsOnly: true);
     }
 }

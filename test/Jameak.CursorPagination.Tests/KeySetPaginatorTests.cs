@@ -218,7 +218,7 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
     private Task InternalCheckSyncPagination<TStrategy, T, TCursor>(
         PaginationDirection direction,
         ComputeTotalCount computeTotal,
-        Func<TestDbContext, DbSet<T>> getDbTable,
+        Func<TestDbContext, IQueryable<T>> getDbTable,
         Func<TestDbContext, IEnumerable<T>> expectedOrder)
         where TStrategy : IKeySetPaginationStrategy<T, TCursor>, new()
         where TCursor : class, IKeySetCursor
@@ -245,8 +245,15 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
         var previousPageResults = new List<bool>();
         foreach (var page in pages)
         {
-            Assert.True(page.TotalCount.HasValue);
-            Assert.Equal(dbContext.SimplePropertyTestTable.Count(), page.TotalCount.Value);
+            if (computeTotal != ComputeTotalCount.Never)
+            {
+                Assert.True(page.TotalCount.HasValue);
+                Assert.Equal(dbContext.SimplePropertyTestTable.Count(), page.TotalCount.Value);
+            }
+            else
+            {
+                Assert.False(page.TotalCount.HasValue);
+            }
 
             Assert.True(page.HasNextPage.HasValue);
             nextPageResults.Add(page.HasNextPage.Value);
@@ -314,5 +321,15 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
 
         Assert.True(currentPage.IsEmpty);
         return currentPage;
+    }
+
+    [Fact]
+    public void NestedPropertiesWork()
+    {
+        InternalCheckSyncPagination<PocoWithNestedPropertyKeySetStrategy, PocoWithNestedProperty, PocoWithNestedPropertyKeySetStrategy.Cursor>(
+            PaginationDirection.Forward,
+            ComputeTotalCount.Never,
+            dbContext => dbContext.PocoWithNestedPropertyTestTable.Include(e => e.NestedData).AsQueryable(),
+            (dbContext => PocoWithNestedPropertyKeySetStrategyTestHelper.ApplyExpectedCorrectOrderForwardDirection(dbContext.PocoWithNestedPropertyTestTable.Include(e => e.NestedData).AsQueryable())));
     }
 }

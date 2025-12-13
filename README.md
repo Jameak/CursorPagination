@@ -1,5 +1,6 @@
-# <img src="images/icon.png" alt="Icon" width="25" height="25"> Jameak.CursorPagination
+# ![](https://raw.githubusercontent.com/Jameak/CursorPagination/refs/heads/main/images/icon_32.png) Jameak.CursorPagination
 [![CI](https://github.com/Jameak/CursorPagination/actions/workflows/ci.yml/badge.svg)](https://github.com/Jameak/CursorPagination/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/v/Jameak.CursorPagination.svg)](https://www.nuget.org/packages/Jameak.CursorPagination/)
 [![NuGet](https://img.shields.io/nuget/dt/Jameak.CursorPagination?label=NuGet)](https://www.nuget.org/packages/Jameak.CursorPagination/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
@@ -201,7 +202,7 @@ If you need the data in reverse order, use forward pagination with the opposite 
 
 ### Non-materializing pagination
 For use-cases that requires the pagination to __not__ materialize the dataset so that the IQueryable can be further combined, such as when paginating nested collections, it is possible to apply pagination to the `IQueryable` using the generated pagination class:
-```
+```csharp
 IQueryable<TypeToPaginate> paginatedQueryable = paginationStrategy.ApplyPagination(
     queryable,
     pageSize: 100,
@@ -217,6 +218,28 @@ Once the query has been materialized, you must remember to call the appropriate 
 Pass the same arguments you used in the `ApplyPagination` call.
 
 If even more granular control over how the pagination `Expressions` are applied to your `IQueryable` is needed, you can use the `BuildPaginationMethods` method on the generated pagination class to directly obtain `Func`s that apply LINQ `where`, `order`, `skip`, or `take` expressions when invoked.
+
+## Nested properties
+Nested properties are supported when defining your pagination properties. Remember to load the nested properties before paginating your dataset.
+
+```csharp
+var dataset = dbContext.Addresses.Include(adr => adr.Building);
+```
+
+To define a pagination strategy that uses nested properties, simply use a dot-separated property access string like shown below:
+```csharp
+[KeySetPaginationStrategy(typeof(TypeToPaginate), CursorSerialization: KeySetCursorSerializerGeneration.UseSystemTextJson)]
+[PaginationProperty(Order: 0, "Building.ConstructionYear", PaginationOrdering.Ascending)]
+partial class PaginationStrategy;
+```
+
+Alternatively, this library supports a _fullnameof_ that can be used to configure nested member paths using `nameof`. To use _fullnameof_ simply prefix the member path with `@`. Using _fullnameof_ the example from above can be written like this instead:
+```csharp
+[PaginationProperty(Order: 0, nameof(@SomeNamespace.Address.Building.ConstructionYear), PaginationOrdering.Ascending)]
+```
+
+> [!IMPORTANT]
+> Remember that your nested property pagination strategy must have a consistent ordering, as described in [Deterministic ordering](#deterministic-ordering).
 
 ## Minimum requirements
 The source generator in this library uses Microsoft.CodeAnalysis.CSharp version 4.11.0, which imposes a requirement of .NET SDK version 8.0.4xx or newer on consumers, as well as Visual Studio 2022 version 17.11 or newer.

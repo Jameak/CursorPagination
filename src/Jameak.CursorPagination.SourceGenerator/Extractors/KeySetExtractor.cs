@@ -69,7 +69,7 @@ internal class KeySetExtractor : BaseExtractor
         if (propExtraction.properties.Count > 0)
         {
             return new ExtractedKeySetData(
-                generatorClassSymbol.ToNameWithGenerics(),
+                generatorClassSymbol.ToNameWithGenericsAndEscapedKeywords(),
                 SanitizeToValidFilename(generatorClassSymbol.Name),
                 GetEnclosingNamespace(generatorClassSymbol),
                 GetAccessibility(generatorClassSymbol),

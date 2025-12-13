@@ -16,7 +16,7 @@ public class UserClass
 }
 """;
 
-        return TestHelper.Verify([userCode]);
+        return TestHelper.VerifySourceGeneration([userCode]);
     }
 
     [Fact]
@@ -34,6 +34,6 @@ public class UserClass
 }
 """;
 
-        return TestHelper.Verify([userCode]);
+        return TestHelper.VerifySourceGeneration([userCode]);
     }
 }
