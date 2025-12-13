@@ -6,15 +6,19 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Basic.Reference.Assemblies;
 using Jameak.CursorPagination.Abstractions.KeySetPagination;
+using Jameak.CursorPagination.SourceGenerator.Analyzers;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Jameak.CursorPagination.SourceGenerator.Tests;
 
 public static class TestHelper
 {
-    private static readonly ImmutableArray<DiagnosticAnalyzer> s_analyzers = [new InternalUsageDiagnosticAnalyzer()];
+    private static readonly ImmutableArray<DiagnosticAnalyzer> s_analyzers = [new InternalUsageDiagnosticAnalyzer(), new FullNameOfDiagnosticAnalyzer()];
 
     private static readonly HashSet<string> s_allTrackingNames = typeof(TrackingNames)
         .GetFields()
@@ -24,32 +28,113 @@ public static class TestHelper
         .Select(e => e!)
         .ToHashSet();
 
-    public static Task Verify([StringSyntax("csharp")] string sourceCode, [CallerFilePath] string callerFilePath = "")
-    {
-        return Verify([sourceCode], callerFilePath);
-    }
-
-    public static async Task Verify(IEnumerable<string> sourceText, [CallerFilePath] string callerFilePath = "")
-    {
-        var settings = new VerifySettings();
-        settings.UseDirectory(Path.Combine(Path.GetDirectoryName(callerFilePath)!, "__snapshots__"));
-
-        IEnumerable<PortableExecutableReference> references = [
+    private static readonly IReadOnlyList<PortableExecutableReference> s_references = [
             .. Net80.References.All,
             // Jameak.CursorPagination.Abstractions
             MetadataReference.CreateFromFile(typeof(IKeySetCursor).Assembly.Location)
-            ];
+        ];
 
-        // Compilation errors are localized, so to ensure snapshot reproducibility we force a consistent culture.
-        using var cultureScope = new ChangeCultureScope("en-US");
+    public static async Task AssertDiagnosticsWithCodeFixer<T>(
+        string sourceTextUnderTest,
+        string expectedFix,
+        List<string> otherSourceTexts,
+        List<(string diagnosticId, int count)> expectedDiagnostics)
+        where T : CodeFixProvider, new()
+    {
+        var (documentUnderTest, solution) = SetupTestProject(sourceTextUnderTest, otherSourceTexts);
+        var analyzerDiagnostics = await RunProjectCompilationGetAnalyzerDiagnostics(documentUnderTest.Project);
+        AssertAnalyzerDiagnosticsAsExpected(analyzerDiagnostics, expectedDiagnostics);
+        await AssertCodeFixAsExpected(documentUnderTest, solution, expectedFix, analyzerDiagnostics);
 
+        static async Task<ImmutableArray<Diagnostic>> RunProjectCompilationGetAnalyzerDiagnostics(Project project)
+        {
+            var compilation = await project.GetCompilationAsync();
+            var analyzerCompilation = compilation!.WithAnalyzers(s_analyzers);
+            var analyzerDiags = await analyzerCompilation.GetAnalyzerDiagnosticsAsync(CancellationToken.None);
+            return analyzerDiags;
+        }
+
+        static (Document documentUnderTest, Solution solution) SetupTestProject(
+            string sourceTextUnderTest,
+            List<string> otherSourceTexts)
+        {
+            var testProjectName = "TestProject";
+            var projectId = ProjectId.CreateNewId(debugName: testProjectName);
+
+            var solution = new AdhocWorkspace()
+                .CurrentSolution
+                .AddProject(projectId, testProjectName, testProjectName, LanguageNames.CSharp)
+                .WithProjectParseOptions(projectId, CSharpParseOptions.Default)
+                .AddMetadataReferences(projectId, s_references);
+
+            for (var i = 0; i < otherSourceTexts.Count; i++)
+            {
+                var source = otherSourceTexts[i];
+                var fileName = "Test" + i.ToString(CultureInfo.InvariantCulture) + ".cs";
+                var documentId = DocumentId.CreateNewId(projectId, debugName: fileName);
+                solution = solution.AddDocument(documentId, fileName, SourceText.From(source), filePath: fileName);
+            }
+
+            var documentUnderTestId = DocumentId.CreateNewId(projectId, debugName: "UnderTest.cs");
+            solution = solution.AddDocument(documentUnderTestId, "UnderTest.cs", SourceText.From(sourceTextUnderTest), filePath: "UnderTest.cs");
+
+            var project = solution.GetProject(projectId)!;
+            var document = project.GetDocument(documentUnderTestId)!;
+            return (document, solution);
+        }
+
+        static void AssertAnalyzerDiagnosticsAsExpected(
+            ImmutableArray<Diagnostic> analyzerDiagnostics,
+            List<(string diagnosticId, int count)> expectedDiagnostics)
+        {
+            var expectedMap = expectedDiagnostics.ToDictionary(e => e.diagnosticId, e => e.count);
+            foreach (var diagnosticsGroup in analyzerDiagnostics.GroupBy(e => e.Id))
+            {
+                var wasExpected = expectedMap.TryGetValue(diagnosticsGroup.Key, out var expectedCount);
+                Assert.True(wasExpected);
+                Assert.Equal(expectedCount, diagnosticsGroup.Count());
+            }
+        }
+
+        static async Task AssertCodeFixAsExpected(
+            Document documentUnderTest,
+            Solution solution,
+            string expectedFix,
+            ImmutableArray<Diagnostic> analyzerDiagnostics)
+        {
+            var updatedSolution = solution;
+            var updatedDocument = documentUnderTest;
+            var codeFixer = new T();
+            foreach (var diagnostic in analyzerDiagnostics)
+            {
+                var actions = new List<CodeAction>();
+                var context = new CodeFixContext(updatedDocument, diagnostic, (a, _) => actions.Add(a), CancellationToken.None);
+                await codeFixer.RegisterCodeFixesAsync(context);
+
+                if (actions.Count == 0)
+                {
+                    continue;
+                }
+
+                var operations = await actions.Single().GetOperationsAsync(CancellationToken.None);
+                updatedSolution = operations.OfType<ApplyChangesOperation>().Single().ChangedSolution;
+                updatedDocument = updatedSolution.GetDocument(documentUnderTest.Id)!;
+            }
+
+            var documentString = await updatedDocument.GetTextAsync();
+            Assert.Equal(expectedFix, documentString.ToString(), ignoreLineEndingDifferences: true);
+        }
+    }
+
+    private static async Task<(GeneratorDriver driverWithResults, CSharpCompilation compilation, ImmutableArray<Diagnostic> analyzerDiagnostics)> RunSourceGenerationTestCompilation(IEnumerable<string> sourceText)
+    {
         var compileOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             .WithNullableContextOptions(NullableContextOptions.Enable)
             .WithSpecificDiagnosticOptions(s_analyzers.SelectMany(e => e.SupportedDiagnostics).Select(diag => new KeyValuePair<string, ReportDiagnostic>(diag.Id, GetReportDiagnostic(diag))));
         var compilation = CSharpCompilation.Create(
             assemblyName: "Tests",
             syntaxTrees: sourceText.Select(sourceCode => CSharpSyntaxTree.ParseText(sourceCode)),
-            references: references,
+            references: s_references,
             compileOptions);
         var generator = new PaginationGenerator();
         var generatorDriverOptions = new GeneratorDriverOptions(disabledOutputs: IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true);
@@ -60,31 +145,56 @@ public static class TestHelper
 
         var analyzerCompilation = compilation.WithAnalyzers(s_analyzers);
         var analyzerDiags = await analyzerCompilation.GetAnalyzerDiagnosticsAsync(CancellationToken.None);
+        return (updatedDriverWithResults, compilation, analyzerDiags);
+    }
+
+    public static Task VerifySourceGeneration([StringSyntax("csharp")] string sourceCode, bool diagnosticsOnly = false, [CallerFilePath] string callerFilePath = "")
+    {
+        return VerifySourceGeneration([sourceCode], diagnosticsOnly, callerFilePath);
+    }
+
+    public static async Task VerifySourceGeneration(IEnumerable<string> sourceText, bool diagnosticsOnly = false, [CallerFilePath] string callerFilePath = "")
+    {
+        var settings = new VerifySettings();
+        settings.UseDirectory(Path.Combine(Path.GetDirectoryName(callerFilePath)!, "__snapshots__"));
+        // Compilation errors are localized, so to ensure snapshot reproducibility we force a consistent culture.
+        using var cultureScope = new ChangeCultureScope("en-US");
+
+        var (driverWithResults, compilation, analyzerDiagnostics) = await RunSourceGenerationTestCompilation(sourceText);
 
         // Generator reported error diagnostics
-        if (updatedDriverWithResults.GetRunResult().Results
+        if (driverWithResults.GetRunResult().Results
             .SelectMany(e => e.Diagnostics.Where(e => e.DefaultSeverity == DiagnosticSeverity.Error))
             .Any())
         {
-            await Verifier.Verify(updatedDriverWithResults, settings)
-                .AppendAnalyzerDiagsIfAny(analyzerDiags);
+            await Verifier.Verify(driverWithResults, settings)
+                .AppendAnalyzerDiagsIfAny(analyzerDiagnostics);
             return;
         }
 
         // No error diagnostics reported.
         // Compile the generated code to check that the emitted code is actually valid
         var updatedCompilation = compilation.AddSyntaxTrees(
-            updatedDriverWithResults.GetRunResult().Results
+            driverWithResults.GetRunResult().Results
             .SelectMany(r => r.GeneratedSources)
             .Select(gs => CSharpSyntaxTree.ParseText(gs.SourceText, CSharpParseOptions.Default, gs.HintName)));
 
         using var dll = new MemoryStream();
         var emitted = updatedCompilation.Emit(dll);
 
-        await Verifier.Verify(updatedDriverWithResults, settings)
+
+        if (diagnosticsOnly)
+        {
+            await Verifier.Verify(analyzerDiagnostics
+                .Concat(driverWithResults.GetRunResult().Results.SelectMany(e => e.Diagnostics))
+                .Concat(emitted.Diagnostics));
+            return;
+        }
+
+        await Verifier.Verify(driverWithResults, settings)
             .AppendValue("generated-code-can-compile", emitted.Success)
             .AppendValue("generated-code-compilation-diagnostics", emitted.Diagnostics)
-            .AppendAnalyzerDiagsIfAny(analyzerDiags);
+            .AppendAnalyzerDiagsIfAny(analyzerDiagnostics);
     }
 
     private static SettingsTask AppendAnalyzerDiagsIfAny(this SettingsTask settingsTask, ImmutableArray<Diagnostic> analyzerDiags)

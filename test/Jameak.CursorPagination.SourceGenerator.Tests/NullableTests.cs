@@ -25,7 +25,7 @@ public partial class TestStrategy
 }
 """;
 
-        return TestHelper.Verify([paginatedTypeWithNullables, paginationStrategy]);
+        return TestHelper.VerifySourceGeneration([paginatedTypeWithNullables, paginationStrategy]);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([PaginatedTypeWithNullableProperty, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([PaginatedTypeWithNullableProperty, StrategyDecl]);
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([PaginatedTypeWithNullableProperty, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([PaginatedTypeWithNullableProperty, StrategyDecl]);
     }
 
     [Fact]
@@ -135,7 +135,7 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([PaginatedTypeWithNullableProperty, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([PaginatedTypeWithNullableProperty, StrategyDecl]);
     }
 
     [Fact]
@@ -163,7 +163,7 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([PaginatedType, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([PaginatedType, StrategyDecl]);
     }
 
     [Fact]
@@ -192,6 +192,6 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([PaginatedType, StrategyDecl]);
+        return TestHelper.VerifySourceGeneration([PaginatedType, StrategyDecl]);
     }
 }

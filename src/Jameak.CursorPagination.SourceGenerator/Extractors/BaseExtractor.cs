@@ -14,7 +14,7 @@ internal abstract partial class BaseExtractor
         {
             extractedData = CreateError(
                 generatorClassSymbol,
-                DiagnosticHelper.CreateGeneralPaginatedTypeIsUnsupportedDiagnostic(CacheableLocation.CreateFromLocations(generatorClassSymbol.Locations), paginationTargetType.ToNameWithGenerics()));
+                DiagnosticHelper.CreateGeneralPaginatedTypeIsUnsupportedDiagnostic(CacheableLocation.CreateFromLocations(generatorClassSymbol.Locations), paginationTargetType.ToNameWithGenericsAndEscapedKeywords()));
             return true;
         }
 
@@ -29,19 +29,19 @@ internal abstract partial class BaseExtractor
             return true;
         }
 
-        if (IsErrorKind(paginationNamedTargetType))
-        {
-            extractedData = CreateError(
-                generatorClassSymbol,
-                DiagnosticHelper.CreateRequiredTypeIsErrorKindDiagnostic(CacheableLocation.CreateFromLocations(generatorClassSymbol.Locations), paginationNamedTargetType.ToNameWithGenerics()));
-            return true;
-        }
-
         if (paginationNamedTargetType.IsUnboundGenericType)
         {
             extractedData = CreateError(
                 generatorClassSymbol,
-                DiagnosticHelper.CreateUnboundGenericIsNotSupportedDiagnostic(CacheableLocation.CreateFromLocations(generatorClassSymbol.Locations), generatorClassSymbol.Name, paginationNamedTargetType.ToNameWithGenerics()));
+                DiagnosticHelper.CreateUnboundGenericIsNotSupportedDiagnostic(CacheableLocation.CreateFromLocations(generatorClassSymbol.Locations), generatorClassSymbol.Name, paginationNamedTargetType.ToNameWithGenericsAndEscapedKeywords()));
+            return true;
+        }
+
+        if (IsErrorKind(paginationNamedTargetType))
+        {
+            extractedData = CreateError(
+                generatorClassSymbol,
+                DiagnosticHelper.CreateRequiredTypeIsErrorKindDiagnostic(CacheableLocation.CreateFromLocations(generatorClassSymbol.Locations), paginationNamedTargetType.ToNameWithGenericsAndEscapedKeywords()));
             return true;
         }
 
@@ -49,7 +49,7 @@ internal abstract partial class BaseExtractor
         {
             extractedData = CreateError(
                 generatorClassSymbol,
-                DiagnosticHelper.CreateGenericClassIsNotSupportedDiagnostic(CacheableLocation.CreateFromLocations(generatorClassSymbol.Locations), generatorClassSymbol.ToNameWithGenerics()));
+                DiagnosticHelper.CreateGenericClassIsNotSupportedDiagnostic(CacheableLocation.CreateFromLocations(generatorClassSymbol.Locations), generatorClassSymbol.ToNameWithGenericsAndEscapedKeywords()));
             return true;
         }
 

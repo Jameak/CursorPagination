@@ -58,6 +58,6 @@ public partial class TestKeysetPaginationStrategy
 }
 """;
 
-        return TestHelper.Verify([s_paginatedType, strategyDefinition]);
+        return TestHelper.VerifySourceGeneration([s_paginatedType, strategyDefinition]);
     }
 }

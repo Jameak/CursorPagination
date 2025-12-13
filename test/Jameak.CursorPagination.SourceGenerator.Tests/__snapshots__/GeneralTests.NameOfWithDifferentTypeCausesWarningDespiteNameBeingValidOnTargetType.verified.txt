@@ -1,0 +1,16 @@
+﻿[
+  {
+    Location: : (6,23)-(6,49),
+    Message: Nameof argument uses type 'global::TestNamespace.OtherInput' which is different from the configured paginated type 'global::TestNamespace.TestInput' which is likely unintended,
+    Severity: Warning,
+    WarningLevel: 1,
+    Descriptor: {
+      Id: JAMCP0020,
+      Title: Nameof references different type than the paginated type,
+      MessageFormat: Nameof argument uses type '{0}' which is different from the configured paginated type '{1}' which is likely unintended,
+      Category: Usage,
+      DefaultSeverity: Warning,
+      IsEnabledByDefault: true
+    }
+  }
+]

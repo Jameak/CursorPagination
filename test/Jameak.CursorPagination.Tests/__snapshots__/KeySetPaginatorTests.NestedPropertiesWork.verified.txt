@@ -1,0 +1,63 @@
+﻿[  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__p_0='4'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT "p"."IntProp", "p"."NestedDataIntProp", "n"."IntProp", "n"."StringProp"
+      FROM "PocoWithNestedPropertyTestTable" AS "p"
+      INNER JOIN "NestedData" AS "n" ON "p"."NestedDataIntProp" = "n"."IntProp"
+      ORDER BY "n"."StringProp", "p"."IntProp", "n"."IntProp"
+      LIMIT @__p_0
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__NestedData_StringPropValue_0='a' (Size = 1), @__IntPropValue_1='1', @__NestedData_IntPropValue_2='7'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT EXISTS (
+          SELECT 1
+          FROM "PocoWithNestedPropertyTestTable" AS "p"
+          INNER JOIN "NestedData" AS "n" ON "p"."NestedDataIntProp" = "n"."IntProp"
+          WHERE "n"."StringProp" <= @__NestedData_StringPropValue_0 AND ("n"."StringProp" < @__NestedData_StringPropValue_0 OR ("n"."StringProp" = @__NestedData_StringPropValue_0 AND "p"."IntProp" < @__IntPropValue_1) OR ("n"."StringProp" = @__NestedData_StringPropValue_0 AND "p"."IntProp" = @__IntPropValue_1 AND "n"."IntProp" < @__NestedData_IntPropValue_2)))
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__NestedData_StringPropValue_0='a' (Size = 1), @__IntPropValue_1='3', @__NestedData_IntPropValue_2='5', @__p_3='4'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT "p"."IntProp", "p"."NestedDataIntProp", "n"."IntProp", "n"."StringProp"
+      FROM "PocoWithNestedPropertyTestTable" AS "p"
+      INNER JOIN "NestedData" AS "n" ON "p"."NestedDataIntProp" = "n"."IntProp"
+      WHERE "n"."StringProp" >= @__NestedData_StringPropValue_0 AND ("n"."StringProp" > @__NestedData_StringPropValue_0 OR ("n"."StringProp" = @__NestedData_StringPropValue_0 AND "p"."IntProp" > @__IntPropValue_1) OR ("n"."StringProp" = @__NestedData_StringPropValue_0 AND "p"."IntProp" = @__IntPropValue_1 AND "n"."IntProp" > @__NestedData_IntPropValue_2))
+      ORDER BY "n"."StringProp", "p"."IntProp", "n"."IntProp"
+      LIMIT @__p_3
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__NestedData_StringPropValue_0='a' (Size = 1), @__IntPropValue_1='6', @__NestedData_IntPropValue_2='2'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT EXISTS (
+          SELECT 1
+          FROM "PocoWithNestedPropertyTestTable" AS "p"
+          INNER JOIN "NestedData" AS "n" ON "p"."NestedDataIntProp" = "n"."IntProp"
+          WHERE "n"."StringProp" <= @__NestedData_StringPropValue_0 AND ("n"."StringProp" < @__NestedData_StringPropValue_0 OR ("n"."StringProp" = @__NestedData_StringPropValue_0 AND "p"."IntProp" < @__IntPropValue_1) OR ("n"."StringProp" = @__NestedData_StringPropValue_0 AND "p"."IntProp" = @__IntPropValue_1 AND "n"."IntProp" < @__NestedData_IntPropValue_2)))
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__NestedData_StringPropValue_0='c' (Size = 1), @__IntPropValue_1='5', @__NestedData_IntPropValue_2='3', @__p_3='4'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT "p"."IntProp", "p"."NestedDataIntProp", "n"."IntProp", "n"."StringProp"
+      FROM "PocoWithNestedPropertyTestTable" AS "p"
+      INNER JOIN "NestedData" AS "n" ON "p"."NestedDataIntProp" = "n"."IntProp"
+      WHERE "n"."StringProp" >= @__NestedData_StringPropValue_0 AND ("n"."StringProp" > @__NestedData_StringPropValue_0 OR ("n"."StringProp" = @__NestedData_StringPropValue_0 AND "p"."IntProp" > @__IntPropValue_1) OR ("n"."StringProp" = @__NestedData_StringPropValue_0 AND "p"."IntProp" = @__IntPropValue_1 AND "n"."IntProp" > @__NestedData_IntPropValue_2))
+      ORDER BY "n"."StringProp", "p"."IntProp", "n"."IntProp"
+      LIMIT @__p_3
+  
+info: RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (scrubbed execution time) [Parameters=[@__NestedData_StringPropValue_0='d' (Size = 1), @__IntPropValue_1='7', @__NestedData_IntPropValue_2='1'], CommandType='Text', CommandTimeout='30']
+      -- TaggedTestQueryable
+      
+      SELECT EXISTS (
+          SELECT 1
+          FROM "PocoWithNestedPropertyTestTable" AS "p"
+          INNER JOIN "NestedData" AS "n" ON "p"."NestedDataIntProp" = "n"."IntProp"
+          WHERE "n"."StringProp" <= @__NestedData_StringPropValue_0 AND ("n"."StringProp" < @__NestedData_StringPropValue_0 OR ("n"."StringProp" = @__NestedData_StringPropValue_0 AND "p"."IntProp" < @__IntPropValue_1) OR ("n"."StringProp" = @__NestedData_StringPropValue_0 AND "p"."IntProp" = @__IntPropValue_1 AND "n"."IntProp" < @__NestedData_IntPropValue_2)))
+]

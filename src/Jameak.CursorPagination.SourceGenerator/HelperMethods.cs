@@ -6,6 +6,7 @@ using Jameak.CursorPagination.Abstractions.Enums;
 using Jameak.CursorPagination.SourceGenerator.Helpers;
 using Jameak.CursorPagination.SourceGenerator.Poco;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Jameak.CursorPagination.SourceGenerator;
 internal static class HelperMethods
@@ -78,10 +79,10 @@ internal static class HelperMethods
             {
                 if (property.NullCoalesceRhs != null)
                 {
-                    return ($"(obj.{property.PropertyName} ?? {property.NullCoalesceRhs})");
+                    return ($"(obj.{property.PropertyAccessor} ?? {property.NullCoalesceRhs})");
                 }
 
-                return $"obj.{property.PropertyName}";
+                return $"obj.{property.PropertyAccessor}";
             }
         }
     }
@@ -131,9 +132,10 @@ internal static class HelperMethods
         return constructorArgs.Any(arg => arg.Kind == TypedConstantKind.Error);
     }
 
-    internal static bool IsErrorKind(ITypeSymbol symbol)
+    internal static bool IsErrorKind(INamedTypeSymbol symbol)
     {
-        return symbol.Kind == SymbolKind.ErrorType;
+        return symbol.Kind == SymbolKind.ErrorType
+            || symbol.TypeArguments.Any(e => e is INamedTypeSymbol named && IsErrorKind(named));
     }
 
     internal static object? GetArgumentValue(TypedConstant argument)
@@ -195,4 +197,14 @@ internal static class HelperMethods
     internal static string SanitizeToValidFilename(string input) => input.Replace('@', '_');
 
     internal static string TrimGlobalAlias(string typeFullName) => typeFullName.StartsWith("global::") ? typeFullName.Substring("global::".Length) : typeFullName;
+
+    internal static SimpleNameSyntax? GetFirstSimpleNameSyntaxSyntax(ExpressionSyntax argumentExpression)
+    {
+        return argumentExpression
+            .DescendantNodesAndSelf()
+            .OfType<SimpleNameSyntax>()
+            .FirstOrDefault(sn =>
+                sn.Parent is not AliasQualifiedNameSyntax aliasSyntax ||
+                aliasSyntax.Alias != sn);
+    }
 }

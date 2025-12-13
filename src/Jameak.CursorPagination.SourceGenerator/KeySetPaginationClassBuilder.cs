@@ -306,7 +306,7 @@ file class {{PrivateHelperClassName}}
     private static string CreateCursorConstructor(EquatableArray<PropertyConfiguration> properties)
     {
         return $$"""
-            {{Indent(2)}}public {{GeneratedCursorClassName}}({{string.Join(", ", properties.Select(prop => prop.PropertyTypeFullName + " " + prop.PropertyName))}})
+            {{Indent(2)}}public {{GeneratedCursorClassName}}({{string.Join(", ", properties.Select(prop => prop.PropertyTypeFullName + " " + prop.PropertyNameForCursorField))}})
             {{Indent(2)}}{
             {{string.Join("\n", properties.Select(GeneratePropertyAssignment))}}
             {{Indent(2)}}}
@@ -318,15 +318,15 @@ file class {{PrivateHelperClassName}}
             if (prop.IsNullableValueType && prop.NullCoalesceRhs == null)
             {
                 sb.AppendLine($$"""
-                                     {{Indent(3)}}if ({{prop.PropertyName}} == null)
+                                     {{Indent(3)}}if ({{prop.PropertyNameForCursorField}} == null)
                                      {{Indent(3)}}{
-                                     {{Indent(3)}}    throw new global::{{typeof(KeySetCursorNullValueException).FullName}}(nameof({{prop.PropertyName}}));
+                                     {{Indent(3)}}    throw new global::{{typeof(KeySetCursorNullValueException).FullName}}(nameof({{prop.PropertyNameForCursorField}}));
                                      {{Indent(3)}}}
                                      """);
                 sb.AppendLine();
             }
 
-            sb.Append($"{Indent(3)}this.{prop.PropertyName} = {prop.PropertyName};");
+            sb.Append($"{Indent(3)}this.{prop.PropertyNameForCursorField} = {prop.PropertyNameForCursorField};");
             return sb.ToString();
         }
     }
@@ -339,7 +339,7 @@ file class {{PrivateHelperClassName}}
             {{Indent(2)}}    return null;
             {{Indent(2)}}}
 
-            {{string.Join("\n", data.PropertyConfigurations.Select(prop => $"{Indent(2)}var {prop.PropertyName}Value = cursor.{prop.PropertyName};"))}}
+            {{string.Join("\n", data.PropertyConfigurations.Select(prop => $"{Indent(2)}var {prop.PropertyNameForCursorField}Value = cursor.{prop.PropertyNameForCursorField};"))}}
 
             {{Indent(2)}}switch (paginationDirection)
             {{Indent(2)}}{
@@ -427,15 +427,15 @@ file class {{PrivateHelperClassName}}
         {
             if (property.NullCoalesceRhs != null)
             {
-                return ($"(obj.{property.PropertyName} ?? {property.NullCoalesceRhs})", $"({property.PropertyName}Value ?? {property.NullCoalesceRhs})");
+                return ($"(obj.{property.PropertyAccessor} ?? {property.NullCoalesceRhs})", $"({property.PropertyNameForCursorField}Value ?? {property.NullCoalesceRhs})");
             }
 
             if (property.IsNullableValueType)
             {
-                return ($"obj.{property.PropertyName}!.Value", $"{property.PropertyName}Value!.Value");
+                return ($"obj.{property.PropertyAccessor}!.Value", $"{property.PropertyNameForCursorField}Value!.Value");
             }
 
-            return ($"obj.{property.PropertyName}!", $"{property.PropertyName}Value!");
+            return ($"obj.{property.PropertyAccessor}!", $"{property.PropertyNameForCursorField}Value!");
         }
     }
 
@@ -444,8 +444,8 @@ file class {{PrivateHelperClassName}}
         var errors = new List<CacheableDiagnosticInfo>();
 
         var orderByMethodBody = CreateApplyOrderByMethodBody(data.PropertyConfigurations, 2);
-        var cursorConstructorcallArguments = string.Join(", ", data.PropertyConfigurations.Select(prop => "data." + prop.PropertyName));
-        var cursorProperties = string.Join("\n", data.PropertyConfigurations.Select(prop => $"{Indent(2)}public {prop.PropertyTypeFullName} {prop.PropertyName} {{ get; init; }}"));
+        var cursorConstructorcallArguments = string.Join(", ", data.PropertyConfigurations.Select(prop => "data." + prop.PropertyAccessor));
+        var cursorProperties = string.Join("\n", data.PropertyConfigurations.Select(prop => $"{Indent(2)}public {prop.PropertyTypeFullName} {prop.PropertyNameForCursorField} {{ get; init; }}"));
 
         var jsonSerialiationIsEnabledAndDateTimePropertyExists = data.GenerateKeySetCursorSerialization == KeySetCursorSerializerGeneration.UseSystemTextJson && data.PropertyConfigurations.Any(e => e.PropertyTypeFullName == "global::System.DateTime");
         var additionalFileLocalClasses = "";
@@ -487,6 +487,6 @@ file class {{PrivateHelperClassName}}
     private static string CreateJsonNamingPolicySwitchCases(string strategyClassName, EquatableArray<PropertyConfiguration> propertyConfigurations)
     {
         return string.Join(",\n", propertyConfigurations
-            .Select((prop, index) => $"{Indent(3)}nameof({strategyClassName}.{GeneratedCursorClassName}.{prop.PropertyName}) => \"{index}\"")) + ",";
+            .Select((prop, index) => $"{Indent(3)}nameof({strategyClassName}.{GeneratedCursorClassName}.{prop.PropertyNameForCursorField}) => \"{index}\"")) + ",";
     }
 }

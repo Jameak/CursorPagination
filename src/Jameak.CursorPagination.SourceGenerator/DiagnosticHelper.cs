@@ -21,10 +21,12 @@ internal static class DiagnosticHelper
     private const string NestedClassIsNotSupportedId = "JAMCP0012";
     private const string InternalUsageOnlyId = "JAMCP0013";
     private const string UnboundGenericNotSupportedId = "JAMCP0014";
-    private const string GenericGeneratorClassNotSupportedRule = "JAMCP0015";
-    private const string RequiredTypeIsErrorKindRule = "JAMCP0016";
-    private const string GeneralPaginatedTypeIsUnsupportedRule = "JAMCP0017";
+    private const string GenericGeneratorClassNotSupportedId = "JAMCP0015";
+    private const string RequiredTypeIsErrorKindId = "JAMCP0016";
+    private const string GeneralPaginatedTypeIsUnsupportedId = "JAMCP0017";
     private const string KeySetPropertyIsNullableValueTypeId = "JAMCP0018";
+    private const string SuspiciousNameOfId = "JAMCP0019";
+    private const string NameOfReferencesDifferentTypeId = "JAMCP0020";
 
     private static readonly DiagnosticDescriptor s_couldNotGenerateForTypeRule = new(
         id: CouldNotGenerateForTypeId,
@@ -139,7 +141,7 @@ internal static class DiagnosticHelper
         isEnabledByDefault: true);
 
     internal static readonly DiagnosticDescriptor s_genericGeneratorClassNotSupportedRule = new(
-        id: GenericGeneratorClassNotSupportedRule,
+        id: GenericGeneratorClassNotSupportedId,
         title: "Generic strategy type not supported",
         messageFormat: "Cannot generate pagination strategy for '{0}' because source generation for generic strategy-types is not supported",
         category: "Usage",
@@ -147,7 +149,7 @@ internal static class DiagnosticHelper
         isEnabledByDefault: true);
 
     internal static readonly DiagnosticDescriptor s_requiredTypeIsErrorKindRule = new(
-        id: RequiredTypeIsErrorKindRule,
+        id: RequiredTypeIsErrorKindId,
         title: "Type is error kind",
         messageFormat: "Cannot get data for the symbol '{0}'. This is likely because the code has compilation errors.",
         category: "Usage",
@@ -155,7 +157,7 @@ internal static class DiagnosticHelper
         isEnabledByDefault: true);
 
     internal static readonly DiagnosticDescriptor s_generalPaginatedTypeIsUnsupportedRule = new(
-        id: GeneralPaginatedTypeIsUnsupportedRule,
+        id: GeneralPaginatedTypeIsUnsupportedId,
         title: "Paginated type is not supported kind",
         messageFormat: "The paginated type '{0}' is not supported for source generation",
         category: "Usage",
@@ -166,6 +168,24 @@ internal static class DiagnosticHelper
         id: KeySetPropertyIsNullableValueTypeId,
         title: "Configured KeySet pagination property is nullable value type",
         messageFormat: "Property '{0}' is nullable value type '{1}'. This will likely work if no 'null' values exist in your data and your ORM behaves, but is not generally supported by this library. If a 'null'-value is ever encountered the Cursor-constructor will throw KeySetCursorNullValueException.",
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
+
+    internal static readonly DiagnosticDescriptor s_suspiciousNameOfRule = new(
+        id: SuspiciousNameOfId,
+        title: "Suspicious non-fullnameof usage",
+#pragma warning disable RS1032
+        messageFormat: "The 'nameof' operation references more than one nested member. This is likely unintended as the 'nameof' will evaluate to the last referenced member. Did you intend to use 'fullnameof' but forget to prefix the argument with '@'?",
+#pragma warning restore RS1032
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
+
+    private static readonly DiagnosticDescriptor s_nameOfReferencesDifferentTypeRule = new(
+        id: NameOfReferencesDifferentTypeId,
+        title: "Nameof references different type than the paginated type",
+        messageFormat: "Nameof argument uses type '{0}' which is different from the configured paginated type '{1}' which is likely unintended",
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
@@ -187,10 +207,11 @@ internal static class DiagnosticHelper
             ClassIsMissingPartialKeywordId => s_classIsMissingPartialKeywordRule,
             NestedClassIsNotSupportedId => s_nestedClassIsNotSupportedRule,
             UnboundGenericNotSupportedId => s_unboundGenericNotSupportedRule,
-            GenericGeneratorClassNotSupportedRule => s_genericGeneratorClassNotSupportedRule,
-            RequiredTypeIsErrorKindRule => s_requiredTypeIsErrorKindRule,
-            GeneralPaginatedTypeIsUnsupportedRule => s_generalPaginatedTypeIsUnsupportedRule,
+            GenericGeneratorClassNotSupportedId => s_genericGeneratorClassNotSupportedRule,
+            RequiredTypeIsErrorKindId => s_requiredTypeIsErrorKindRule,
+            GeneralPaginatedTypeIsUnsupportedId => s_generalPaginatedTypeIsUnsupportedRule,
             KeySetPropertyIsNullableValueTypeId => s_keySetPropertyIsNullableValueTypeRule,
+            NameOfReferencesDifferentTypeId => s_nameOfReferencesDifferentTypeRule,
             _ => throw new ArgumentException(nameof(id), $"Unknown id: {id}")
         };
     }
@@ -296,21 +317,21 @@ internal static class DiagnosticHelper
         EquatableArray<CacheableLocation>? locations,
         string typeMarkedWithGeneratorAttribute)
     {
-        return new CacheableDiagnosticInfo(GenericGeneratorClassNotSupportedRule, locations, [typeMarkedWithGeneratorAttribute]);
+        return new CacheableDiagnosticInfo(GenericGeneratorClassNotSupportedId, locations, [typeMarkedWithGeneratorAttribute]);
     }
 
     public static CacheableDiagnosticInfo CreateRequiredTypeIsErrorKindDiagnostic(
         EquatableArray<CacheableLocation>? locations,
         string typeWithError)
     {
-        return new CacheableDiagnosticInfo(RequiredTypeIsErrorKindRule, locations, [typeWithError]);
+        return new CacheableDiagnosticInfo(RequiredTypeIsErrorKindId, locations, [typeWithError]);
     }
 
     public static CacheableDiagnosticInfo CreateGeneralPaginatedTypeIsUnsupportedDiagnostic(
         EquatableArray<CacheableLocation>? locations,
         string paginationTargetTypeName)
     {
-        return new CacheableDiagnosticInfo(GeneralPaginatedTypeIsUnsupportedRule, locations, [paginationTargetTypeName]);
+        return new CacheableDiagnosticInfo(GeneralPaginatedTypeIsUnsupportedId, locations, [paginationTargetTypeName]);
     }
 
     public static CacheableDiagnosticInfo CreateKeySetPropertyIsNullableValueTypeDiagnostic(
@@ -319,5 +340,13 @@ internal static class DiagnosticHelper
         string propertyType)
     {
         return new CacheableDiagnosticInfo(KeySetPropertyIsNullableValueTypeId, locations, [propertyName, HelperMethods.TrimGlobalAlias(propertyType)]);
+    }
+
+    public static CacheableDiagnosticInfo CreateNameOfReferencesDifferentTypeDiagnostic(
+        EquatableArray<CacheableLocation> locations,
+        string nameofTypeName,
+        string paginationTargetTypeName)
+    {
+        return new CacheableDiagnosticInfo(NameOfReferencesDifferentTypeId, locations, [nameofTypeName, paginationTargetTypeName]);
     }
 }

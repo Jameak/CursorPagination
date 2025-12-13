@@ -5,7 +5,7 @@ namespace Jameak.CursorPagination.SourceGenerator.Poco;
 internal record PropertyConfiguration
 {
     public int Order { get; }
-    public string PropertyName { get; }
+    public string PropertyAccessor { get; }
     public string PropertyTypeFullName { get; private set; }
     public PaginationOrdering Direction { get; }
     public string? NullCoalesceRhs { get; }
@@ -13,17 +13,21 @@ internal record PropertyConfiguration
 
     public PropertyConfiguration(
         int order,
-        string propertyName,
+        string propertyAccessor,
         PaginationOrdering direction,
         string propertyTypeFullName,
         string? nullCoalesceRhs,
         bool isNullableValueType)
     {
         Order = order;
-        PropertyName = propertyName;
+        PropertyAccessor = propertyAccessor;
         Direction = direction;
         PropertyTypeFullName = propertyTypeFullName;
         NullCoalesceRhs = nullCoalesceRhs;
         IsNullableValueType = isNullableValueType;
     }
+
+    public string PropertyNameForCursorField => PropertyAccessor.Contains('.')
+        ? PropertyAccessor.Replace('.', '_').Replace('?', '_').Replace('!', '_').Replace('@', '_')
+        : PropertyAccessor;
 }

@@ -10,6 +10,7 @@ public class TestDbContext : DbContext
     public DbSet<NullablePropertyWithDbComputedColumnPoco> ComputedNullableTestTable { get; set; }
     public DbSet<NullablePropertyPoco> NullableTestTable { get; set; }
     public DbSet<SimpleFieldPoco> SimpleFieldTestTable { get; set; }
+    public DbSet<PocoWithNestedProperty> PocoWithNestedPropertyTestTable { get; set; }
 
     public IEnumerable<string> LogMessages => _logMessages;
 

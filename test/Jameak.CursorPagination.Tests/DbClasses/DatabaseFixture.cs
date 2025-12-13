@@ -27,6 +27,7 @@ public sealed class DatabaseFixture : IDisposable
 
         context.AddRange(TestHelper.CreateSimplePropertyPocoData());
         context.AddRange(TestHelper.CreateSimpleFieldPocoData());
+        context.AddRange(TestHelper.CreatePocoWithNestedPropertyData());
         context.SaveChanges();
     }
 

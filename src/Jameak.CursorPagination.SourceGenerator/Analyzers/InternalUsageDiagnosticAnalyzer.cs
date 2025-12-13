@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Jameak.CursorPagination.SourceGenerator;
+namespace Jameak.CursorPagination.SourceGenerator.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 internal sealed partial class InternalUsageDiagnosticAnalyzer : DiagnosticAnalyzer

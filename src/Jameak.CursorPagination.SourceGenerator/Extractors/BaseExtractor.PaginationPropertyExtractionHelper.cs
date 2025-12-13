@@ -3,6 +3,7 @@ using Jameak.CursorPagination.Abstractions.Attributes;
 using Jameak.CursorPagination.Abstractions.Enums;
 using Jameak.CursorPagination.SourceGenerator.Poco;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Jameak.CursorPagination.SourceGenerator.HelperMethods;
 
 namespace Jameak.CursorPagination.SourceGenerator.Extractors;
@@ -10,6 +11,8 @@ internal abstract partial class BaseExtractor
 {
     private class PaginationPropertyExtractionHelper
     {
+        private const char MemberAccessSeparator = '.';
+
         private readonly GeneratorAttributeSyntaxContext _context;
         private readonly INamedTypeSymbol _generatorClassSymbol;
         private readonly ITypeSymbol _paginationTargetType;
@@ -44,16 +47,16 @@ internal abstract partial class BaseExtractor
                 return ([], _errors, _warnings);
             }
 
-            ReportDuplicatePropertyNames(tempProperties);
+            ReportDuplicatePropertyNames(tempProperties, out var tempPropertiesWithoutDuplicates);
 
-            var finalProperties = RetrievePropertyDetails(tempProperties);
+            var finalProperties = RetrievePropertyDetails(tempPropertiesWithoutDuplicates);
 
             ReportPropertiesWithDuplicateOrder(finalProperties);
 
             return (finalProperties, _errors, _warnings);
         }
 
-        private static void ExtractPaginationPropertyData(
+        private void ExtractPaginationPropertyData(
             AttributeData paginationPropertyAttributeData,
             ref List<TemporaryPropertyConfiguration> properties)
         {
@@ -65,27 +68,50 @@ internal abstract partial class BaseExtractor
 
             // Assumes PaginationPropertyAttribute only has a single constructor.
             var paginationOrder = GetArgumentValue(constructorArgs[0]) as int?;
-            var paginationPropertyName = GetArgumentValue(constructorArgs[1]) as string;
+            var paginationPropertyName = HandlePaginationPropertyPath(paginationPropertyAttributeData);
             var paginationDirection = GetArgumentValue(constructorArgs[2], typeof(PaginationOrdering)) as PaginationOrdering?;
             var nullCoalesceRhs = GetArgumentValue(constructorArgs[3]) as string;
 
-            if (paginationOrder.HasValue && paginationPropertyName != null && paginationDirection.HasValue)
+            if (paginationOrder.HasValue && paginationPropertyName != null && paginationPropertyName.Length > 0 && paginationDirection.HasValue)
             {
                 properties.Add(new TemporaryPropertyConfiguration(paginationOrder.Value, paginationPropertyName, paginationDirection.Value, nullCoalesceRhs));
             }
         }
 
-        private void ReportDuplicatePropertyNames(List<TemporaryPropertyConfiguration> tempProperties)
+        private string[]? HandlePaginationPropertyPath(AttributeData paginationPropertyAttributeData)
         {
-            var duplicateProperties = tempProperties.GroupBy(e => e.PropertyName).Where(e => e.Count() > 1).ToList();
-            if (duplicateProperties.Any())
+            var attributeArgumentSyntax = (IReadOnlyList<AttributeArgumentSyntax>?)((AttributeSyntax?)paginationPropertyAttributeData.ApplicationSyntaxReference?.GetSyntax())?.ArgumentList?.Arguments;
+
+            var propertyNameSyntax = attributeArgumentSyntax![1];
+
+            if (propertyNameSyntax.TryGetNameOfContent(_context, out var splitNameOfContent, out var referencedMemberRootType))
             {
-                foreach (var property in duplicateProperties)
+                if (referencedMemberRootType != null && !referencedMemberRootType.Equals(_paginationTargetType, SymbolEqualityComparer.Default))
                 {
-                    _alreadyErroredProps.Add(property.Key);
-                    _errors.Add(DiagnosticHelper.CreateDuplicatePropertiesDefinedDiagnostic(CacheableLocation.CreateFromLocations(_generatorClassSymbol.Locations), property.Key, _generatorClassSymbol.Name));
+                    _warnings.Add(DiagnosticHelper.CreateNameOfReferencesDifferentTypeDiagnostic(
+                        CacheableLocation.CreateFromLocations([propertyNameSyntax.GetLocation()]),
+                        referencedMemberRootType.ToFullyQualified(),
+                        _paginationTargetType.ToFullyQualified()));
                 }
+
+                return splitNameOfContent;
             }
+
+            return (GetArgumentValue(paginationPropertyAttributeData.ConstructorArguments[1]) as string)
+                ?.Split(MemberAccessSeparator)
+                .ToArray();
+        }
+
+        private void ReportDuplicatePropertyNames(List<TemporaryPropertyConfiguration> tempProperties, out List<TemporaryPropertyConfiguration> tempPropertiesWithoutDuplicates)
+        {
+            var duplicateProperties = tempProperties.GroupBy(e => e.PropertyNameFullName).Where(e => e.Count() > 1).ToList();
+            foreach (var property in duplicateProperties)
+            {
+                _alreadyErroredProps.Add(property.Key);
+                _errors.Add(DiagnosticHelper.CreateDuplicatePropertiesDefinedDiagnostic(CacheableLocation.CreateFromLocations(_generatorClassSymbol.Locations), property.Key, _generatorClassSymbol.Name));
+            }
+
+            tempPropertiesWithoutDuplicates = tempProperties.GroupBy(e => e.PropertyNameFullName).Where(e => e.Count() == 1).SelectMany(e => e).ToList();
         }
 
         private void ReportPropertiesWithDuplicateOrder(List<PropertyConfiguration> finalProperties)
@@ -102,58 +128,97 @@ internal abstract partial class BaseExtractor
 
         private List<PropertyConfiguration> RetrievePropertyDetails(List<TemporaryPropertyConfiguration> tempProperties)
         {
-            var tempPropConfigDict = tempProperties.GroupBy(e => e.PropertyName).Where(e => e.Count() == 1).SelectMany(e => e).ToDictionary(e => e.PropertyName, e => e);
-            var validMembers = GetAccessiblePropertyAndFieldMembers(_paginationTargetType, _generatorClassSymbol, _context);
             var finalProperties = new List<PropertyConfiguration>();
-
-            foreach (var (_, member, config) in validMembers
-                .Select(member => (found: tempPropConfigDict.TryGetValue(member.Name, out var config), member, config))
-                .Where(e => e.found))
+            foreach (var tempProperty in tempProperties)
             {
-                if (member is IPropertySymbol propertySymbol)
+                var prop = RetrievePropertyDetailsRecursive(tempProperty, 0, _paginationTargetType, string.Empty);
+                if (prop != null)
                 {
-                    if (propertySymbol.GetMethod == null)
-                    {
-                        _alreadyErroredProps.Add(member.Name);
-                        _errors.Add(DiagnosticHelper.CreatePropertyIsWriteOnlyDiagnostic(CacheableLocation.CreateFromLocations(_generatorClassSymbol.Locations), member.Name));
-                        continue;
-                    }
-
-                    if (IsSymbolNotAccessibleThenReportError(member, propertySymbol.GetMethod))
-                    {
-                        continue;
-                    }
-
-                    ReportPropertyTypeDiagnostics(propertySymbol.Type, config);
-                    finalProperties.Add(CreateFinalConfiguration(config, member, propertySymbol.Type));
-                }
-                else if (member is IFieldSymbol fieldSymbol)
-                {
-                    if (IsSymbolNotAccessibleThenReportError(member, fieldSymbol))
-                    {
-                        continue;
-                    }
-
-                    ReportPropertyTypeDiagnostics(fieldSymbol.Type, config);
-                    finalProperties.Add(CreateFinalConfiguration(config, member, fieldSymbol.Type));
+                    finalProperties.Add(prop);
                 }
             }
 
-            if (finalProperties.Count != tempPropConfigDict.Count)
+            if (finalProperties.Count != tempProperties.Count)
             {
-                foreach (var unfoundPropName in tempPropConfigDict.Select(e => e.Key).Except(finalProperties.Select(e => e.PropertyName)).Except(_alreadyErroredProps))
+                foreach (var unfoundPropName in tempProperties.Select(e => e.PropertyNameFullName).Except(finalProperties.Select(e => e.PropertyAccessor)).Except(_alreadyErroredProps))
                 {
                     _errors.Add(DiagnosticHelper.CreateCannotFindPropertyDiagnostic(CacheableLocation.CreateFromLocations(_generatorClassSymbol.Locations), unfoundPropName, _paginationTargetType.ToFullyQualified()));
                 }
             }
 
             return finalProperties;
+        }
 
-            static PropertyConfiguration CreateFinalConfiguration(TemporaryPropertyConfiguration config, ISymbol memberSymbol, ITypeSymbol memberTypeSymbol)
+        private PropertyConfiguration? RetrievePropertyDetailsRecursive(TemporaryPropertyConfiguration tempProperty, int depth, ITypeSymbol enclosingType, string parentMemberPath)
+        {
+            var member = GetAccessiblePropertyAndFieldMembers(enclosingType, _generatorClassSymbol, _context)
+                .Select(member => (found: tempProperty.PropertyNamePath[depth] == member.ToStringWithEscapedKeywords(), member))
+                .Where(e => e.found)
+                .Select(e => e.member)
+                .SingleOrDefault();
+
+            if (member == null)
+            {
+                return null;
+            }
+
+            switch (member)
+            {
+                case IPropertySymbol propertySymbol:
+                    if (propertySymbol.GetMethod == null)
+                    {
+                        _alreadyErroredProps.Add(member.Name);
+                        _errors.Add(DiagnosticHelper.CreatePropertyIsWriteOnlyDiagnostic(CacheableLocation.CreateFromLocations(_generatorClassSymbol.Locations), member.Name));
+                        return null;
+                    }
+
+                    if (IsSymbolNotAccessibleThenReportError(member, propertySymbol.GetMethod))
+                    {
+                        return null;
+                    }
+
+                    return HandleRecursion(propertySymbol.Type);
+                case IFieldSymbol fieldSymbol:
+                    if (IsSymbolNotAccessibleThenReportError(member, fieldSymbol))
+                    {
+                        return null;
+                    }
+
+                    return HandleRecursion(fieldSymbol.Type);
+                default:
+                    // Error is reported elsewhere.
+                    return null;
+            }
+
+            PropertyConfiguration? HandleRecursion(ITypeSymbol enclosingType)
+            {
+                ReportPropertyTypeDiagnostics(enclosingType, tempProperty);
+                var memberPath = parentMemberPath + member.ToStringWithEscapedKeywords();
+
+                // Depth is 0-indexed, length is not, so we +1
+                if (tempProperty.PropertyNamePath.Length > depth + 1)
+                {
+                    var accessor = (enclosingType.IsNullable(), tempProperty.NullCoalesceRhs != null) switch
+                    {
+                        (true, true) => "?.",
+                        (true, false) => "!.",
+                        (false, _) => ".",
+                    };
+                    return RetrievePropertyDetailsRecursive(tempProperty, depth + 1, enclosingType, memberPath + accessor);
+                }
+
+                return CreateFinalConfiguration(tempProperty, member, enclosingType, memberPath);
+            }
+
+            static PropertyConfiguration CreateFinalConfiguration(
+                TemporaryPropertyConfiguration config,
+                ISymbol memberSymbol,
+                ITypeSymbol memberTypeSymbol,
+                string memberAccessor)
             {
                 return new PropertyConfiguration(
                             config.Order,
-                            memberSymbol.ToStringWithEscapedKeywords(),
+                            memberAccessor,
                             config.Direction,
                             memberTypeSymbol.ToFullyQualifiedWithNullRefModifier(),
                             config.NullCoalesceRhs,
@@ -169,14 +234,14 @@ internal abstract partial class BaseExtractor
             {
                 _warnings.Add(DiagnosticHelper.CreateKeySetPropertyIsNullableValueTypeDiagnostic(
                     CacheableLocation.CreateFromLocations(_generatorClassSymbol.Locations),
-                    config.PropertyName,
+                    config.PropertyNameFullName,
                     typeSymbol.ToFullyQualifiedWithNullRefModifier()));
             }
             else if (typeSymbol.IsNullable() && config.NullCoalesceRhs == null)
             {
                 _warnings.Add(DiagnosticHelper.CreatePropertyIsNullableDiagnostic(
                     CacheableLocation.CreateFromLocations(_generatorClassSymbol.Locations),
-                    config.PropertyName,
+                    config.PropertyNameFullName,
                     typeSymbol.ToFullyQualifiedWithNullRefModifier()));
             }
 
@@ -184,7 +249,7 @@ internal abstract partial class BaseExtractor
             {
                 _warnings.Add(DiagnosticHelper.CreateNonNullablePropertyHasNullCoalesceDefinedDiagnostic(
                     CacheableLocation.CreateFromLocations(_generatorClassSymbol.Locations),
-                    config.PropertyName,
+                    config.PropertyNameFullName,
                     typeSymbol.ToFullyQualifiedWithNullRefModifier(),
                     config.NullCoalesceRhs));
             }
@@ -208,21 +273,23 @@ internal abstract partial class BaseExtractor
         private record TemporaryPropertyConfiguration
         {
             public int Order { get; }
-            public string PropertyName { get; }
+            public string[] PropertyNamePath { get; }
             public PaginationOrdering Direction { get; }
             public string? NullCoalesceRhs { get; }
 
             public TemporaryPropertyConfiguration(
                 int order,
-                string propertyName,
+                string[] propertyNamePath,
                 PaginationOrdering direction,
                 string? nullCoalesceRhs)
             {
                 Order = order;
-                PropertyName = propertyName;
+                PropertyNamePath = propertyNamePath;
                 Direction = direction;
                 NullCoalesceRhs = nullCoalesceRhs;
             }
+
+            public string PropertyNameFullName => string.Join(MemberAccessSeparator.ToString(), PropertyNamePath);
         }
     }
 }
