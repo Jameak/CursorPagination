@@ -76,10 +76,12 @@ jobs:
         run: |
           New-Item -Path ${{ runner.temp }}/scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}/scanner
+      - run: dotnet tool install dotnet-coverage
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          ${{ runner.temp }}/scanner/dotnet-sonarscanner begin /k:"Jameak_CursorPagination" /o:"jameak" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-          dotnet build
+          ${{ runner.temp }}/scanner/dotnet-sonarscanner begin /k:"Jameak_CursorPagination" /o:"jameak" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+          dotnet build -c Release
+          dotnet-coverage collect "dotnet test -c Release --no-build --no-restore" -f xml -o "coverage.xml"
           ${{ runner.temp }}/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
