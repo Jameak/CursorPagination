@@ -31,11 +31,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up JDK 17 (SonarQube requirement)
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of SonarQube analysis
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.x
-      - run: ./lint-test-and-nuget-test.ps1 -Env "ci"
+      - name: Cache SonarQube Cloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~\sonar\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache SonarQube Cloud scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}\scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+      - name: Install SonarQube Cloud scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        run: |
+          New-Item -Path ${{ runner.temp }}\scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}\scanner
+      - name: Build and analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"Jameak_CursorPagination" /o:"jameak" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          ./lint-test-and-nuget-test.ps1 -Env "ci"
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - uses: dorny/test-reporter@v2
         if: ${{ !cancelled() }}
         with:
