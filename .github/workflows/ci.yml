@@ -31,7 +31,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up JDK 17 (SonarQube requirement)
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.x
+      - run: ./lint-test-and-nuget-test.ps1 -Env "ci"
+      - uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}
+        with:
+          name: '.NET tests'
+          path: 'test/**/TestResults/**/*.trx'
+          reporter: 'dotnet-trx'
+
+  sonarqube-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
@@ -65,11 +81,5 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           ${{ runner.temp }}/scanner/dotnet-sonarscanner begin /k:"Jameak_CursorPagination" /o:"jameak" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-          ./lint-test-and-nuget-test.ps1 -Env "ci"
+          dotnet build
           ${{ runner.temp }}/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-      - uses: dorny/test-reporter@v2
-        if: ${{ !cancelled() }}
-        with:
-          name: '.NET tests'
-          path: 'test/**/TestResults/**/*.trx'
-          reporter: 'dotnet-trx'
