@@ -82,6 +82,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           ${{ runner.temp }}/scanner/dotnet-sonarscanner begin /k:"Jameak_CursorPagination" /o:"jameak" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
-          dotnet build -c Release
-          dotnet dotnet-coverage collect "dotnet test -c Release --no-build --no-restore" -f xml -o "coverage.xml"
+          dotnet build
+          dotnet dotnet-coverage collect "dotnet test --no-build --no-restore" -f xml -o "coverage.xml"
           ${{ runner.temp }}/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
