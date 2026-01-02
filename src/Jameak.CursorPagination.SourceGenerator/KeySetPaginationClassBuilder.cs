@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Jameak.CursorPagination.Abstractions.Enums;
 using Jameak.CursorPagination.Abstractions.Exceptions;
@@ -8,7 +9,7 @@ using Jameak.CursorPagination.SourceGenerator.Poco;
 using static Jameak.CursorPagination.SourceGenerator.HelperMethods;
 
 namespace Jameak.CursorPagination.SourceGenerator;
-internal class KeySetPaginationClassBuilder
+internal static class KeySetPaginationClassBuilder
 {
     private const string PrivateHelperClassName = "PrivateHelper";
     private const string GeneratedCursorClassName = "Cursor";
@@ -18,7 +19,6 @@ internal class KeySetPaginationClassBuilder
     private const string GeneratorClassNamePlaceholder = "{CLASS_NAME}";
     private const string TargetClassTypePlaceholder = "{TARGET_CLASS_TYPE}";
     private const string TargetClassTypeXmlDocPlaceholder = "{TARGET_CLASS_TYPE_XMLDOC}";
-    private const string PropertyFieldFullNamePlaceholder = "{PROPERTY_FIELD_FULLNAME}";
     private const string ApplyOrderByMethodBodyPlaceholder = "{APPLY_ORDER_BY_METHOD}";
     private const string GetWhereExprMethodBodyPlaceholder = "{GET_WHERE_EXPR_METHOD_BODY}";
     private const string CursorCallConstructorPlaceholder = "{CURSOR_CONSTRUCTOR_CALL_ARGUMENTS}";
@@ -407,7 +407,7 @@ file class {{PrivateHelperClassName}}
                 PaginationDirection.Forward when property.Direction == PaginationOrdering.Descending => false,
                 PaginationDirection.Backward when property.Direction == PaginationOrdering.Ascending => false,
                 PaginationDirection.Backward when property.Direction == PaginationOrdering.Descending => true,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Unhandled direction value: direction={direction} & property.Direction={property.Direction}")
+                _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Unhandled direction value: direction={direction} & property.Direction={property.Direction}"),
             };
 
             return orEqual
@@ -487,6 +487,6 @@ file class {{PrivateHelperClassName}}
     private static string CreateJsonNamingPolicySwitchCases(string strategyClassName, EquatableArray<PropertyConfiguration> propertyConfigurations)
     {
         return string.Join(",\n", propertyConfigurations
-            .Select((prop, index) => $"{Indent(3)}nameof({strategyClassName}.{GeneratedCursorClassName}.{prop.PropertyNameForCursorField}) => \"{index}\"")) + ",";
+            .Select((prop, index) => $"{Indent(3)}nameof({strategyClassName}.{GeneratedCursorClassName}.{prop.PropertyNameForCursorField}) => \"{index.ToString(CultureInfo.InvariantCulture)}\"")) + ",";
     }
 }

@@ -39,4 +39,4 @@ app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
         .Select(endpoint => endpoint is RouteEndpoint route ? route.RoutePattern.RawText + " (" + route + ")" : endpoint.ToString()));
 });
 
-app.Run();
+await app.RunAsync();

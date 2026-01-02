@@ -1,6 +1,6 @@
 # ![](https://raw.githubusercontent.com/Jameak/CursorPagination/refs/heads/main/images/icon_32.png) Jameak.CursorPagination
 [![CI](https://github.com/Jameak/CursorPagination/actions/workflows/ci.yml/badge.svg)](https://github.com/Jameak/CursorPagination/actions/workflows/ci.yml)
-[![NuGet](https://img.shields.io/nuget/v/Jameak.CursorPagination.svg)](https://www.nuget.org/packages/Jameak.CursorPagination/)
+[![NuGet](https://img.shields.io/nuget/v/Jameak.CursorPagination.svg?label=NuGet)](https://www.nuget.org/packages/Jameak.CursorPagination/)
 [![NuGet](https://img.shields.io/nuget/dt/Jameak.CursorPagination?label=NuGet)](https://www.nuget.org/packages/Jameak.CursorPagination/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
@@ -200,7 +200,7 @@ If you need the data in reverse order, use forward pagination with the opposite 
 > [!IMPORTANT]
 > Backward pagination requires an index that matches the opposite sort order of the forward pagination query.
 
-### Non-materializing pagination
+## Non-materializing pagination
 For use-cases that requires the pagination to __not__ materialize the dataset so that the IQueryable can be further combined, such as when paginating nested collections, it is possible to apply pagination to the `IQueryable` using the generated pagination class:
 ```csharp
 IQueryable<TypeToPaginate> paginatedQueryable = paginationStrategy.ApplyPagination(
@@ -228,7 +228,7 @@ var dataset = dbContext.Addresses.Include(adr => adr.Building);
 
 To define a pagination strategy that uses nested properties, simply use a dot-separated property access string like shown below:
 ```csharp
-[KeySetPaginationStrategy(typeof(TypeToPaginate), CursorSerialization: KeySetCursorSerializerGeneration.UseSystemTextJson)]
+[KeySetPaginationStrategy(typeof(Address), CursorSerialization: KeySetCursorSerializerGeneration.UseSystemTextJson)]
 [PaginationProperty(Order: 0, "Building.ConstructionYear", PaginationOrdering.Ascending)]
 partial class PaginationStrategy;
 ```

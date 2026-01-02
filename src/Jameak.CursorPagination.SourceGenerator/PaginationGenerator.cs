@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Globalization;
 using Jameak.CursorPagination.Abstractions.Attributes;
 using Jameak.CursorPagination.SourceGenerator.Extractors;
 using Jameak.CursorPagination.SourceGenerator.Helpers;
@@ -11,7 +12,7 @@ using static Jameak.CursorPagination.SourceGenerator.HelperMethods;
 namespace Jameak.CursorPagination.SourceGenerator;
 
 [Generator]
-internal partial class PaginationGenerator : IIncrementalGenerator
+internal sealed partial class PaginationGenerator : IIncrementalGenerator
 {
     private static readonly string s_offsetPaginationStrategyAttributeFullName = typeof(OffsetPaginationStrategyAttribute).FullName;
     private static readonly string s_keysetPaginationStrategyAttributeFullName = typeof(KeySetPaginationStrategyAttribute).FullName;
@@ -52,7 +53,7 @@ internal partial class PaginationGenerator : IIncrementalGenerator
         var extractionsWithPotentiallyUpdatedNames = new List<BaseExtractedData>();
         foreach (var extractedData in extractedDataArray
             .OrderBy(e => e.Name, StringComparer.Ordinal)
-            .ThenBy(e => e is ExtractedKeySetData kd ? kd.Namespace : (e is ExtractedOffsetData ed ? ed.Namespace : ""))
+            .ThenBy(GetNamespaceValue)
             .ThenBy(e => CreateMd5Hash(e.ToString())))
         {
             for (var i = -1; true; i++)
@@ -67,7 +68,7 @@ internal partial class PaginationGenerator : IIncrementalGenerator
                 }
                 else
                 {
-                    var candidateName = extractedData.Name + i;
+                    var candidateName = extractedData.Name + i.ToString(CultureInfo.InvariantCulture);
                     if (usedNames.Add(candidateName))
                     {
                         var updated = extractedData with { HintName = candidateName };
@@ -79,6 +80,21 @@ internal partial class PaginationGenerator : IIncrementalGenerator
         }
 
         return extractionsWithPotentiallyUpdatedNames.ToImmutableArray().AsEquatableArray();
+
+        static string? GetNamespaceValue(BaseExtractedData extractedData)
+        {
+            if (extractedData is ExtractedKeySetData kd)
+            {
+                return kd.Namespace;
+            }
+
+            if (extractedData is ExtractedOffsetData ed)
+            {
+                return ed.Namespace;
+            }
+
+            return "";
+        }
     }
 
     private static void Execute(SourceProductionContext context, BaseExtractedData extractedData, string hintNamePostfix)

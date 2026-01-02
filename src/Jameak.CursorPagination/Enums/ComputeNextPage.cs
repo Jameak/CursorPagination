@@ -17,5 +17,5 @@ public enum ComputeNextPage
     /// <para>Additionally, with this option set, when the 'next page' computation determines that no next page exists,
     /// attempting to retrieve the next page will skip the database round-trip and directly return an empty page.</para>
     /// </summary>
-    EveryPageAndPreventNextPageQueryOnLastPage = 3
+    EveryPageAndPreventNextPageQueryOnLastPage = 3,
 }

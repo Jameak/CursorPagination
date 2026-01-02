@@ -37,9 +37,9 @@ public class PaginatedBatchJob : BackgroundService
                 await ProcessInBatches(stoppingToken);
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
-            _logger.LogInformation("Background paginated batch job is stopping.");
+            _logger.LogInformation(ex, "Background paginated batch job is stopping.");
         }
     }
 

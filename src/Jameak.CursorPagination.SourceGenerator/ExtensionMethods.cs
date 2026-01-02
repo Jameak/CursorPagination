@@ -90,7 +90,7 @@ internal static class ExtensionMethods
             while (memberRefOperation != null)
             {
                 memberPath.Add(memberRefOperation.Member);
-                memberRefOperation = memberRefOperation?.ChildOperations.FirstOrDefault() as IMemberReferenceOperation;
+                memberRefOperation = memberRefOperation.ChildOperations.FirstOrDefault() as IMemberReferenceOperation;
                 memberContainingRootType = memberRefOperation == null ? memberContainingRootType : memberRefOperation.Member.ContainingType;
             }
 

@@ -38,7 +38,8 @@ public static class KeySetPaginator
         PaginationDirection paginationDirection,
         int? totalCount,
         ComputeTotalCount computeTotalCount)
-        where TCursor : IKeySetCursor
+        where T : class
+        where TCursor : class, IKeySetCursor
     {
         ArgumentNullException.ThrowIfNull(strategy);
         ArgumentNullException.ThrowIfNull(queryable);
@@ -115,7 +116,8 @@ public static class KeySetPaginator
         ComputeNextPage computeNextPage = ComputeNextPage.EveryPage,
         PaginationDirection paginationDirection = PaginationDirection.Forward,
         ComputeTotalCount computeTotalCount = ComputeTotalCount.Never)
-        where TCursor : IKeySetCursor
+        where T : class
+        where TCursor : class, IKeySetCursor
     {
         return InternalApplyPagination(
             strategy: strategy,
@@ -153,6 +155,7 @@ public static class KeySetPaginator
         ComputeNextPage computeNextPage = ComputeNextPage.EveryPage,
         PaginationDirection paginationDirection = PaginationDirection.Forward,
         ComputeTotalCount computeTotalCount = ComputeTotalCount.Never)
+        where T : class
         where TCursor : class, IKeySetCursor
         where TStrategy : IKeySetPaginationStrategy<T, TCursor>, IKeySetCursorSerializer<TCursor>
     {
@@ -183,7 +186,8 @@ public static class KeySetPaginator
         int? totalCount,
         ComputeTotalCount computeTotalCount,
         CancellationToken cancellationToken)
-        where TCursor : IKeySetCursor
+        where T : class
+        where TCursor : class, IKeySetCursor
     {
         ArgumentNullException.ThrowIfNull(strategy);
         ArgumentNullException.ThrowIfNull(queryable);
@@ -283,7 +287,8 @@ public static class KeySetPaginator
         PaginationDirection paginationDirection = PaginationDirection.Forward,
         ComputeTotalCount computeTotalCount = ComputeTotalCount.Never,
         CancellationToken cancellationToken = default)
-        where TCursor : IKeySetCursor
+        where T : class
+        where TCursor : class, IKeySetCursor
     {
         return await InternalApplyPaginationAsync(
             strategy: strategy,
@@ -341,6 +346,7 @@ public static class KeySetPaginator
         PaginationDirection paginationDirection = PaginationDirection.Forward,
         ComputeTotalCount computeTotalCount = ComputeTotalCount.Never,
         CancellationToken cancellationToken = default)
+        where T : class
         where TCursor : class, IKeySetCursor
         where TStrategy : IKeySetPaginationStrategy<T, TCursor>, IKeySetCursorSerializer<TCursor>
     {

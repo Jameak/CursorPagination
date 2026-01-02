@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using static Jameak.CursorPagination.SourceGenerator.HelperMethods;
 
 namespace Jameak.CursorPagination.SourceGenerator.Extractors;
-internal class KeySetExtractor : BaseExtractor
+internal sealed class KeySetExtractor : BaseExtractor
 {
     internal override bool TryHandle(GeneratorAttributeSyntaxContext context, INamedTypeSymbol generatorClassSymbol, out BaseExtractedData? extractedData)
     {

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -70,7 +71,7 @@ internal static class HelperMethods
                 PaginationDirection.Backward when index == 0 && propertyConfig.Direction == PaginationOrdering.Descending => "global::System.Linq.Queryable.OrderBy(queryable, ",
                 PaginationDirection.Backward when index != 0 && propertyConfig.Direction == PaginationOrdering.Ascending => "global::System.Linq.Queryable.ThenByDescending(orderedQueryable, ",
                 PaginationDirection.Backward when index != 0 && propertyConfig.Direction == PaginationOrdering.Descending => "global::System.Linq.Queryable.ThenBy(orderedQueryable, ",
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Unhandled direction value: direction={direction} & index={index} & propertyConfig.Direction={propertyConfig.Direction}")
+                _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Unhandled direction value: direction={direction} & index={index.ToString(CultureInfo.InvariantCulture)} & propertyConfig.Direction={propertyConfig.Direction}"),
             };
 
             return $"{(index == 0 ? "var " : "")}orderedQueryable = {orderMethod}(obj => {GetPropertyValue(propertyConfig)}));";
@@ -100,8 +101,8 @@ internal static class HelperMethods
     internal static IEnumerable<ISymbol> GetAccessiblePropertyAndFieldMembers(ITypeSymbol symbol, ITypeSymbol accessibleWithinSymbol, GeneratorAttributeSyntaxContext context)
     {
         return GetAllMembers(symbol)
-            .Where(e => e is { IsStatic: false, Kind: SymbolKind.Property } or IFieldSymbol { IsStatic: false, AssociatedSymbol: null })
-            .Where(e => context.SemanticModel.Compilation.IsSymbolAccessibleWithin(e, accessibleWithinSymbol))
+            .Where(e => e is { IsStatic: false, Kind: SymbolKind.Property } or IFieldSymbol { IsStatic: false, AssociatedSymbol: null }
+                && context.SemanticModel.Compilation.IsSymbolAccessibleWithin(e, accessibleWithinSymbol))
             .GroupBy(e => e.Name).Select(e => e.First());
     }
 
@@ -140,7 +141,7 @@ internal static class HelperMethods
 
     internal static object? GetArgumentValue(TypedConstant argument)
     {
-        return GetArgumentValue(argument, null);
+        return GetArgumentValue(argument, targetType: null);
     }
 
     internal static object? GetArgumentValue(TypedConstant argument, Type? targetType)
@@ -152,7 +153,7 @@ internal static class HelperMethods
             TypedConstantKind.Primitive => argument.Value,
             TypedConstantKind.Type => argument.Value,
             TypedConstantKind.Array => argument.Values.Select(value => GetArgumentValue(value, targetType)).ToArray(),
-            _ => null
+            _ => null,
         };
     }
 
@@ -165,7 +166,7 @@ internal static class HelperMethods
             Accessibility.Protected => "protected",
             Accessibility.ProtectedOrInternal => "protected internal",
             Accessibility.Private => "private",
-            _ => throw new InvalidOperationException($"Unknown accessibility: {symbol.DeclaredAccessibility}")
+            _ => throw new InvalidOperationException($"Unknown accessibility: {symbol.DeclaredAccessibility}"),
         };
     }
 
