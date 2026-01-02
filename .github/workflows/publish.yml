@@ -18,6 +18,8 @@ defaults:
 jobs:
   package-for-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-dotnet@v5
@@ -34,6 +36,8 @@ jobs:
   validate-package:
     runs-on: ubuntu-latest
     needs: [ package-for-release ]
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-dotnet@v5

@@ -29,6 +29,8 @@ defaults:
 jobs:
   sonarqube-scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Set up JDK 17
