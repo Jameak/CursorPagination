@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language:
+        include:
         - language: actions
           build-mode: none
         - language: csharp
