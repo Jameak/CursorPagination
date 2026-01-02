@@ -38,7 +38,7 @@ public static class KeySetPaginator
         PaginationDirection paginationDirection,
         int? totalCount,
         ComputeTotalCount computeTotalCount)
-        where TCursor : IKeySetCursor
+        where TCursor : class, IKeySetCursor
     {
         ArgumentNullException.ThrowIfNull(strategy);
         ArgumentNullException.ThrowIfNull(queryable);
@@ -115,7 +115,7 @@ public static class KeySetPaginator
         ComputeNextPage computeNextPage = ComputeNextPage.EveryPage,
         PaginationDirection paginationDirection = PaginationDirection.Forward,
         ComputeTotalCount computeTotalCount = ComputeTotalCount.Never)
-        where TCursor : IKeySetCursor
+        where TCursor : class, IKeySetCursor
     {
         return InternalApplyPagination(
             strategy: strategy,
@@ -183,7 +183,7 @@ public static class KeySetPaginator
         int? totalCount,
         ComputeTotalCount computeTotalCount,
         CancellationToken cancellationToken)
-        where TCursor : IKeySetCursor
+        where TCursor : class, IKeySetCursor
     {
         ArgumentNullException.ThrowIfNull(strategy);
         ArgumentNullException.ThrowIfNull(queryable);
@@ -283,7 +283,7 @@ public static class KeySetPaginator
         PaginationDirection paginationDirection = PaginationDirection.Forward,
         ComputeTotalCount computeTotalCount = ComputeTotalCount.Never,
         CancellationToken cancellationToken = default)
-        where TCursor : IKeySetCursor
+        where TCursor : class, IKeySetCursor
     {
         return await InternalApplyPaginationAsync(
             strategy: strategy,
