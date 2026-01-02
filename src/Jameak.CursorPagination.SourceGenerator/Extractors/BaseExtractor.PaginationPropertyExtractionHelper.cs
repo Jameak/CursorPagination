@@ -9,7 +9,7 @@ using static Jameak.CursorPagination.SourceGenerator.HelperMethods;
 namespace Jameak.CursorPagination.SourceGenerator.Extractors;
 internal abstract partial class BaseExtractor
 {
-    private class PaginationPropertyExtractionHelper
+    private sealed class PaginationPropertyExtractionHelper
     {
         private const char MemberAccessSeparator = '.';
 
@@ -207,12 +207,11 @@ internal abstract partial class BaseExtractor
                     return RetrievePropertyDetailsRecursive(tempProperty, depth + 1, enclosingType, memberPath + accessor);
                 }
 
-                return CreateFinalConfiguration(tempProperty, member, enclosingType, memberPath);
+                return CreateFinalConfiguration(tempProperty, enclosingType, memberPath);
             }
 
             static PropertyConfiguration CreateFinalConfiguration(
                 TemporaryPropertyConfiguration config,
-                ISymbol memberSymbol,
                 ITypeSymbol memberTypeSymbol,
                 string memberAccessor)
             {
@@ -270,7 +269,7 @@ internal abstract partial class BaseExtractor
             return false;
         }
 
-        private record TemporaryPropertyConfiguration
+        private sealed record TemporaryPropertyConfiguration
         {
             public int Order { get; }
             public string[] PropertyNamePath { get; }

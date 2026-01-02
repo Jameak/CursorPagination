@@ -15,5 +15,5 @@ public enum ComputeTotalCount
     /// <summary>
     /// The total count will be re-computed on every page.
     /// </summary>
-    EveryPage = 3
+    EveryPage = 3,
 }

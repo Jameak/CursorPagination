@@ -42,7 +42,7 @@ public static class OffsetPaginator
 
         var postProcessed = strategy.PostProcessMaterializedResult(materialized, pageSize, computeNextPage != ComputeNextPage.Never, paginationDirection, afterCursor, out var hasNextPage)
             .ToList();
-        var (previousCursorElement, nextCursorElement) = InternalPaginatorHelper.GetCursorElements(postProcessed, paginationDirection);
+        var (_, nextCursorElement) = InternalPaginatorHelper.GetCursorElements(postProcessed, paginationDirection);
 
         NextPage<T, OffsetCursor> NextPageGenerator(OffsetCursor nextCursor)
         {
@@ -227,7 +227,7 @@ public static class OffsetPaginator
         var postProcessed = strategy.PostProcessMaterializedResult(materialized, pageSize, computeNextPage != ComputeNextPage.Never, paginationDirection, afterCursor, out var hasNextPage)
             .ToList();
 
-        var (previousCursorElement, nextCursorElement) = InternalPaginatorHelper.GetCursorElements(postProcessed, paginationDirection);
+        var (_, nextCursorElement) = InternalPaginatorHelper.GetCursorElements(postProcessed, paginationDirection);
 
         NextPageAsync<T, OffsetCursor> NextPageAsyncGenerator(OffsetCursor nextCursor)
         {

@@ -59,12 +59,9 @@ internal sealed partial class InternalUsageDiagnosticAnalyzer : DiagnosticAnalyz
 
     private static void AnalyzeInvocation(OperationAnalysisContext context, IInvocationOperation invocation)
     {
-        foreach (var argument in invocation.TargetMethod.TypeArguments)
+        foreach (var argument in invocation.TargetMethod.TypeArguments.Where(HasInternalAttribute))
         {
-            if (HasInternalAttribute(argument))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(DiagnosticHelper.s_internalUsageOnlyRule, context.Operation.Syntax.GetLocation(), argument));
-            }
+            context.ReportDiagnostic(Diagnostic.Create(DiagnosticHelper.s_internalUsageOnlyRule, context.Operation.Syntax.GetLocation(), argument));
         }
 
         AnalyzeMember(context, invocation.TargetMethod);

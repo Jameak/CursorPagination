@@ -1,5 +1,5 @@
 namespace Jameak.CursorPagination.SourceGenerator;
-internal class TrackingNames
+internal static class TrackingNames
 {
     public const string InitialOffsetExtraction = nameof(InitialOffsetExtraction);
     public const string InitialKeySetExtraction = nameof(InitialKeySetExtraction);

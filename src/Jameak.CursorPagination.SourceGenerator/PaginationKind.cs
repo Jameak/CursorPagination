@@ -2,5 +2,5 @@
 internal enum PaginationKind
 {
     KeySet,
-    Offset
+    Offset,
 }

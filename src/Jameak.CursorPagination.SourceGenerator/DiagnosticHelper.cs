@@ -7,6 +7,8 @@ using Microsoft.CodeAnalysis;
 namespace Jameak.CursorPagination.SourceGenerator;
 internal static class DiagnosticHelper
 {
+    private const string UsageCategory = "Usage";
+
     private const string CouldNotGenerateForTypeId = "JAMCP0001";
     private const string NoPropertiesDefinedId = "JAMCP0002";
     private const string DuplicatePropertiesDefinedId = "JAMCP0003";
@@ -32,7 +34,7 @@ internal static class DiagnosticHelper
         id: CouldNotGenerateForTypeId,
         title: "Could not generate for type",
         messageFormat: "Unknown error. Could not generate pagination strategy for '{0}'.",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -40,7 +42,7 @@ internal static class DiagnosticHelper
         id: NoPropertiesDefinedId,
         title: "No properties defined",
         messageFormat: "No pagination properties defined for type '{0}'",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -48,7 +50,7 @@ internal static class DiagnosticHelper
         id: DuplicatePropertiesDefinedId,
         title: "Duplicate properties defined",
         messageFormat: "Property with name '{0}' has been defined as pagination property on '{1}' multiple times",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -56,7 +58,7 @@ internal static class DiagnosticHelper
         id: PropertyIsWriteOnlyId,
         title: "Property is write-only",
         messageFormat: "Property with name '{0}' is write-only",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -64,7 +66,7 @@ internal static class DiagnosticHelper
         id: CannotFindPropertyId,
         title: "Cannot find property",
         messageFormat: "Cannot find property or field with name '{0}' on type '{1}', or it is not accessible from the pagination strategy type",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -72,7 +74,7 @@ internal static class DiagnosticHelper
         id: PaginationStrategyCannotBeDeclaredWithBothPaginationAttributesId,
         title: "Pagination strategy cannot be declared with both KeySet and Offset pagination attributes",
         messageFormat: "Pagination strategy with type '{0}' cannot be declared with both '{1}' and '{2}'",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -80,7 +82,7 @@ internal static class DiagnosticHelper
         id: PropertyIsNullableId,
         title: "Configured pagination property is nullable",
         messageFormat: "Property '{0}' is nullable type '{1}'. This will likely work if your ORM behaves but is not generally supported by this library. It is recommended that you instead create a non-nullable computed property or add a null-coalesce expression to the PaginationPropertyAttribute for this property.",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
@@ -88,7 +90,7 @@ internal static class DiagnosticHelper
         id: PropertyIsNotNullableButHasNullCoalesceDefinedId,
         title: "Non-nullable pagination property has null-coalesce configured",
         messageFormat: "Property '{0}' is non-nullable type '{1}' but has a null-coalesce expression '{2}'. This is likely unnecessary and may cause your ORM to generate less-optimal SQL.",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
@@ -96,7 +98,7 @@ internal static class DiagnosticHelper
         id: PropertyGetterIsNotAccessibleId,
         title: "Property getter is not accessible",
         messageFormat: "Property with name '{0}' has getter which is not accessible from the pagination strategy type",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -104,7 +106,7 @@ internal static class DiagnosticHelper
         id: DuplicatePropertyOrderDefinedId,
         title: "Duplicate property order defined",
         messageFormat: "Multiple properties have been defined with the order-value '{0}'",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -112,7 +114,7 @@ internal static class DiagnosticHelper
         id: ClassIsMissingPartialKeywordId,
         title: "Class is missing partial keyword",
         messageFormat: "The class '{0}' is annotated with generator attribute but is not partial",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -120,7 +122,7 @@ internal static class DiagnosticHelper
         id: NestedClassIsNotSupportedId,
         title: "Nested class is not supported",
         messageFormat: "The class '{0}' is a nested class which is not supported",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -128,7 +130,7 @@ internal static class DiagnosticHelper
         id: InternalUsageOnlyId,
         title: "Internal CursorPagination API usage",
         messageFormat: "{0} is an internal API that supports the library infrastructure and not subject to the same compatibility standards as public APIs. It may be changed or removed without notice in any release.",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
@@ -136,7 +138,7 @@ internal static class DiagnosticHelper
         id: UnboundGenericNotSupportedId,
         title: "Unbound generic type not supported",
         messageFormat: "Cannot generate '{0}' because the configured pagination type '{1}' is an unbound generic type. Source generation for unbound generics is not supported.",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -144,7 +146,7 @@ internal static class DiagnosticHelper
         id: GenericGeneratorClassNotSupportedId,
         title: "Generic strategy type not supported",
         messageFormat: "Cannot generate pagination strategy for '{0}' because source generation for generic strategy-types is not supported",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -152,7 +154,7 @@ internal static class DiagnosticHelper
         id: RequiredTypeIsErrorKindId,
         title: "Type is error kind",
         messageFormat: "Cannot get data for the symbol '{0}'. This is likely because the code has compilation errors.",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -160,7 +162,7 @@ internal static class DiagnosticHelper
         id: GeneralPaginatedTypeIsUnsupportedId,
         title: "Paginated type is not supported kind",
         messageFormat: "The paginated type '{0}' is not supported for source generation",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -168,7 +170,7 @@ internal static class DiagnosticHelper
         id: KeySetPropertyIsNullableValueTypeId,
         title: "Configured KeySet pagination property is nullable value type",
         messageFormat: "Property '{0}' is nullable value type '{1}'. This will likely work if no 'null' values exist in your data and your ORM behaves, but is not generally supported by this library. If a 'null'-value is ever encountered the Cursor-constructor will throw KeySetCursorNullValueException.",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
@@ -178,7 +180,7 @@ internal static class DiagnosticHelper
 #pragma warning disable RS1032
         messageFormat: "The 'nameof' operation references more than one nested member. This is likely unintended as the 'nameof' will evaluate to the last referenced member. Did you intend to use 'fullnameof' but forget to prefix the argument with '@'?",
 #pragma warning restore RS1032
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
@@ -186,7 +188,7 @@ internal static class DiagnosticHelper
         id: NameOfReferencesDifferentTypeId,
         title: "Nameof references different type than the paginated type",
         messageFormat: "Nameof argument uses type '{0}' which is different from the configured paginated type '{1}' which is likely unintended",
-        category: "Usage",
+        category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
@@ -212,7 +214,7 @@ internal static class DiagnosticHelper
             GeneralPaginatedTypeIsUnsupportedId => s_generalPaginatedTypeIsUnsupportedRule,
             KeySetPropertyIsNullableValueTypeId => s_keySetPropertyIsNullableValueTypeRule,
             NameOfReferencesDifferentTypeId => s_nameOfReferencesDifferentTypeRule,
-            _ => throw new ArgumentException(nameof(id), $"Unknown id: {id}")
+            _ => throw new ArgumentException(nameof(id), $"Unknown id: {id}"),
         };
     }
 
