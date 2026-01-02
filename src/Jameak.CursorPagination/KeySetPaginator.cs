@@ -38,6 +38,7 @@ public static class KeySetPaginator
         PaginationDirection paginationDirection,
         int? totalCount,
         ComputeTotalCount computeTotalCount)
+        where T : class
         where TCursor : class, IKeySetCursor
     {
         ArgumentNullException.ThrowIfNull(strategy);
@@ -115,6 +116,7 @@ public static class KeySetPaginator
         ComputeNextPage computeNextPage = ComputeNextPage.EveryPage,
         PaginationDirection paginationDirection = PaginationDirection.Forward,
         ComputeTotalCount computeTotalCount = ComputeTotalCount.Never)
+        where T : class
         where TCursor : class, IKeySetCursor
     {
         return InternalApplyPagination(
@@ -153,6 +155,7 @@ public static class KeySetPaginator
         ComputeNextPage computeNextPage = ComputeNextPage.EveryPage,
         PaginationDirection paginationDirection = PaginationDirection.Forward,
         ComputeTotalCount computeTotalCount = ComputeTotalCount.Never)
+        where T : class
         where TCursor : class, IKeySetCursor
         where TStrategy : IKeySetPaginationStrategy<T, TCursor>, IKeySetCursorSerializer<TCursor>
     {
@@ -183,6 +186,7 @@ public static class KeySetPaginator
         int? totalCount,
         ComputeTotalCount computeTotalCount,
         CancellationToken cancellationToken)
+        where T : class
         where TCursor : class, IKeySetCursor
     {
         ArgumentNullException.ThrowIfNull(strategy);
@@ -283,6 +287,7 @@ public static class KeySetPaginator
         PaginationDirection paginationDirection = PaginationDirection.Forward,
         ComputeTotalCount computeTotalCount = ComputeTotalCount.Never,
         CancellationToken cancellationToken = default)
+        where T : class
         where TCursor : class, IKeySetCursor
     {
         return await InternalApplyPaginationAsync(
@@ -341,6 +346,7 @@ public static class KeySetPaginator
         PaginationDirection paginationDirection = PaginationDirection.Forward,
         ComputeTotalCount computeTotalCount = ComputeTotalCount.Never,
         CancellationToken cancellationToken = default)
+        where T : class
         where TCursor : class, IKeySetCursor
         where TStrategy : IKeySetPaginationStrategy<T, TCursor>, IKeySetCursorSerializer<TCursor>
     {

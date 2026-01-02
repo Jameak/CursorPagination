@@ -21,7 +21,9 @@ internal static class InternalPaginatorHelper
         TDataEntry? nextCursorElement,
         EmptyNextPageState emptyNextPageState,
         bool? hasNextPage,
-        ComputeNextPage computeNextPage) where TCursor : class, ICursor
+        ComputeNextPage computeNextPage)
+        where TCursor : class, ICursor
+        where TDataEntry : class
     {
         if (nextCursorElement == null
             || CanSkipNextPageCheck(computeNextPage, hasNextPage))
@@ -38,7 +40,9 @@ internal static class InternalPaginatorHelper
         TDataEntry? nextCursorElement,
         EmptyNextPageStateAsync emptyNextPageState,
         bool? hasNextPage,
-        ComputeNextPage computeNextPage) where TCursor : class, ICursor
+        ComputeNextPage computeNextPage)
+        where TCursor : class, ICursor
+        where TDataEntry : class
     {
         if (nextCursorElement == null
             || CanSkipNextPageCheck(computeNextPage, hasNextPage))
