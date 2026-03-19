@@ -7,6 +7,7 @@ using Jameak.CursorPagination.Tests.DbClasses;
 using Jameak.CursorPagination.Tests.InputClasses;
 
 namespace Jameak.CursorPagination.Tests;
+
 public class OffsetPaginatorTests : IClassFixture<DatabaseFixture>
 {
     private readonly DatabaseFixture _databaseFactory;

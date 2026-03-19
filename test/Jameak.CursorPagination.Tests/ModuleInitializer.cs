@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 
 namespace Jameak.CursorPagination.Tests;
+
 internal static class ModuleInitializer
 {
     [ModuleInitializer]

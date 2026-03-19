@@ -3,6 +3,7 @@ using Jameak.CursorPagination.Abstractions.Enums;
 using Jameak.CursorPagination.SourceGenerator.Helpers;
 
 namespace Jameak.CursorPagination.SourceGenerator.Poco;
+
 internal record ExtractedKeySetData : BaseExtractedData
 {
     public string? Namespace { get; }

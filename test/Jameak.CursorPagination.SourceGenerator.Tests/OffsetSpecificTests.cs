@@ -1,4 +1,5 @@
 namespace Jameak.CursorPagination.SourceGenerator.Tests;
+
 public class OffsetSpecificTests
 {
     private static readonly string s_paginatedType = """

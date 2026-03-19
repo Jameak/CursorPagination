@@ -1,4 +1,5 @@
 namespace Jameak.CursorPagination.SourceGenerator.Tests;
+
 public class ErrorTests
 {
     private const string ValidPaginatedType = """

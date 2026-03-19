@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Jameak.CursorPagination.SourceGenerator;
+
 internal static class HelperMethods
 {
 

@@ -5,6 +5,7 @@ using Jameak.CursorPagination.Enums;
 using Jameak.CursorPagination.Page;
 
 namespace Jameak.CursorPagination;
+
 internal static class InternalPaginatorHelper
 {
     internal sealed record EmptyNextPageState(

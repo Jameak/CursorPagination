@@ -5,6 +5,7 @@ using Jameak.CursorPagination.Abstractions.OffsetPagination;
 using Jameak.CursorPagination.SourceGenerator.IntegrationTests.InputClasses;
 
 namespace Jameak.CursorPagination.SourceGenerator.IntegrationTests;
+
 internal class TestHelper
 {
     public static IEnumerable<SimplePropertyPoco> InfiniteGenerator()

@@ -1,4 +1,5 @@
 namespace Jameak.CursorPagination.SourceGenerator.IntegrationTests.InputClasses;
+
 internal record SimplePropertyPoco
 {
     public required int IntProp { get; set; }

@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 #pragma warning disable RS2008 // Analyzer release tracking
 
 namespace Jameak.CursorPagination.SourceGenerator;
+
 internal static class DiagnosticHelper
 {
     private const string UsageCategory = "Usage";

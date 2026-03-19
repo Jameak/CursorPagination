@@ -1,4 +1,5 @@
 ﻿namespace Jameak.CursorPagination.Tests;
+
 internal class AsyncDelegates
 {
     public static Task<List<T>> SyncToList<T>(IQueryable<T> queryable)

@@ -6,6 +6,7 @@ using Jameak.CursorPagination.Sample.ResponseModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jameak.CursorPagination.Sample.Controllers;
+
 [ApiController]
 [Route("api/[controller]/[action]")]
 public class PaginatedDataController : ControllerBase

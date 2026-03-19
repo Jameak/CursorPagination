@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 namespace Jameak.CursorPagination.Tests.InputClasses;
+
 [PrimaryKey(nameof(IntProp))]
 public record PocoWithNestedProperty
 {

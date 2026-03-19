@@ -6,6 +6,7 @@ using Jameak.CursorPagination.SourceGenerator.Poco;
 using static Jameak.CursorPagination.SourceGenerator.HelperMethods;
 
 namespace Jameak.CursorPagination.SourceGenerator;
+
 internal static class OffsetPaginationClassBuilder
 {
     private const string PrivateHelperClassName = "PrivateHelper";

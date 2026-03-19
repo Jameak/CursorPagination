@@ -1,6 +1,7 @@
 ﻿using Jameak.CursorPagination.SourceGenerator.Analyzers;
 
 namespace Jameak.CursorPagination.SourceGenerator.Tests;
+
 public class FullNameOfDiagnosticAnalyzerTests
 {
     [Fact]

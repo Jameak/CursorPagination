@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Jameak.CursorPagination.SourceGenerator.Helpers;
 
 namespace Jameak.CursorPagination.SourceGenerator.Poco;
+
 internal record ExtractedOffsetData : BaseExtractedData
 {
     public string? Namespace { get; }

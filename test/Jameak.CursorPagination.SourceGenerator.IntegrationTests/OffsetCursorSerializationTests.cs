@@ -2,6 +2,7 @@
 using Jameak.CursorPagination.Abstractions.OffsetPagination;
 
 namespace Jameak.CursorPagination.SourceGenerator.IntegrationTests;
+
 public class OffsetCursorSerializationTests
 {
     [Fact]
