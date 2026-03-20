@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using static Jameak.CursorPagination.SourceGenerator.HelperMethods;
 
 namespace Jameak.CursorPagination.SourceGenerator.Extractors;
+
 internal abstract partial class BaseExtractor
 {
     internal abstract bool TryHandle(GeneratorAttributeSyntaxContext context, INamedTypeSymbol generatorClassSymbol, out BaseExtractedData? extractedData);

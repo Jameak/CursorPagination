@@ -9,6 +9,7 @@ using Jameak.CursorPagination.SourceGenerator.Poco;
 using static Jameak.CursorPagination.SourceGenerator.HelperMethods;
 
 namespace Jameak.CursorPagination.SourceGenerator;
+
 internal static class KeySetPaginationClassBuilder
 {
     private const string PrivateHelperClassName = "PrivateHelper";

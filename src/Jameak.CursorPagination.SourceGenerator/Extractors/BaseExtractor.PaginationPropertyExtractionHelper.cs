@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Jameak.CursorPagination.SourceGenerator.HelperMethods;
 
 namespace Jameak.CursorPagination.SourceGenerator.Extractors;
+
 internal abstract partial class BaseExtractor
 {
     private sealed class PaginationPropertyExtractionHelper

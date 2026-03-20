@@ -6,6 +6,7 @@ using Jameak.CursorPagination.Tests.InputClasses;
 using Microsoft.EntityFrameworkCore;
 
 namespace Jameak.CursorPagination.Tests;
+
 public static partial class TestHelper
 {
     public static void CombinePageHelper<T, TCursor>(LinkedList<RowData<T, TCursor>> combinedList, IReadOnlyList<RowData<T, TCursor>> pageList, PaginationDirection direction) where TCursor : ICursor

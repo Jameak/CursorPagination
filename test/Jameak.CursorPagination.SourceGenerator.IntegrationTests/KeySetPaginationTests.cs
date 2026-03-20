@@ -4,6 +4,7 @@ using Jameak.CursorPagination.SourceGenerator.IntegrationTests.InputClasses;
 using Jameak.CursorPagination.SourceGenerator.IntegrationTests.PartialStrategies;
 
 namespace Jameak.CursorPagination.SourceGenerator.IntegrationTests;
+
 public class KeySetPaginationTests
 {
     private static void AssertStrategyOrdersCorrectly<TCursor>(

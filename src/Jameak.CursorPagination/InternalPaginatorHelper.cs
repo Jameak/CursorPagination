@@ -5,6 +5,7 @@ using Jameak.CursorPagination.Enums;
 using Jameak.CursorPagination.Page;
 
 namespace Jameak.CursorPagination;
+
 internal static class InternalPaginatorHelper
 {
     internal sealed record EmptyNextPageState(
@@ -97,6 +98,13 @@ internal static class InternalPaginatorHelper
             (_, ComputeTotalCount.EveryPage) => true,
             _ => throw new NotSupportedException($"Unhandled switch case: {hasAlreadyComputedCount}. Should never happen, {totalEnum}"),
         };
+    }
+
+    internal static bool CanSetTotalCountFromCurrentPageCount<T, TCursor>(List<T> pageElements, TCursor? cursor, int pageSize) where TCursor : class
+    {
+        var isFirstPage = cursor == null;
+        var pageElementsFewerThanRequested = pageElements.Count < pageSize;
+        return isFirstPage && pageElementsFewerThanRequested;
     }
 
     internal static void ThrowIfEnumNotDefined<T>(T argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null) where T : struct, Enum

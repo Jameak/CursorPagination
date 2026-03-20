@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 
 namespace Jameak.CursorPagination.SourceGenerator;
+
 internal static class ExtensionMethods
 {
     private static readonly SymbolDisplayFormat s_fullyQualifiedWithNullRefModifier =

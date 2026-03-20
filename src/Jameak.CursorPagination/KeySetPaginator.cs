@@ -46,16 +46,18 @@ public static class KeySetPaginator
         InternalPaginatorHelper.ThrowIfEnumNotDefined(computeNextPage);
         InternalPaginatorHelper.ThrowIfEnumNotDefined(computeTotalCount);
 
-        if (InternalPaginatorHelper.ShouldComputeTotalCount(totalCount.HasValue, computeTotalCount))
-        {
-            totalCount = queryable.Count();
-        }
-
         var paginatedQueryable = strategy.ApplyPagination(queryable, pageSize, computeNextPage != ComputeNextPage.Never, paginationDirection, afterCursor);
         var materialized = paginatedQueryable.ToList();
 
         strategy.PostProcessMaterializedResultInPlace(materialized, pageSize, computeNextPage != ComputeNextPage.Never, paginationDirection, out var hasNextPage);
         var (previousCursorElement, nextCursorElement) = InternalPaginatorHelper.GetCursorElements(materialized, paginationDirection);
+
+        if (InternalPaginatorHelper.ShouldComputeTotalCount(totalCount.HasValue, computeTotalCount))
+        {
+            totalCount = InternalPaginatorHelper.CanSetTotalCountFromCurrentPageCount(materialized, afterCursor, pageSize)
+                ? materialized.Count
+                : queryable.Count();
+        }
 
         NextPage<T, TCursor> NextPageGenerator(TCursor nextCursor)
         {
@@ -196,16 +198,18 @@ public static class KeySetPaginator
         InternalPaginatorHelper.ThrowIfEnumNotDefined(computeNextPage);
         InternalPaginatorHelper.ThrowIfEnumNotDefined(computeTotalCount);
 
-        if (InternalPaginatorHelper.ShouldComputeTotalCount(totalCount.HasValue, computeTotalCount))
-        {
-            totalCount = await asyncCountFunc(queryable, cancellationToken);
-        }
-
         var paginatedQueryable = strategy.ApplyPagination(queryable, pageSize, computeNextPage != ComputeNextPage.Never, paginationDirection, afterCursor);
         var materialized = await asyncMaterializationFunc(paginatedQueryable, cancellationToken);
 
         strategy.PostProcessMaterializedResultInPlace(materialized, pageSize, computeNextPage != ComputeNextPage.Never, paginationDirection, out var hasNextPage);
         var (previousCursorElement, nextCursorElement) = InternalPaginatorHelper.GetCursorElements(materialized, paginationDirection);
+
+        if (InternalPaginatorHelper.ShouldComputeTotalCount(totalCount.HasValue, computeTotalCount))
+        {
+            totalCount = InternalPaginatorHelper.CanSetTotalCountFromCurrentPageCount(materialized, afterCursor, pageSize)
+                ? materialized.Count
+                : await asyncCountFunc(queryable, cancellationToken);
+        }
 
         NextPageAsync<T, TCursor> NextPageAsyncGenerator(TCursor nextCursor)
         {
