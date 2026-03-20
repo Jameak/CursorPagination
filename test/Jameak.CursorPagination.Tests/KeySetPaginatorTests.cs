@@ -6,6 +6,7 @@ using Jameak.CursorPagination.Page;
 using Jameak.CursorPagination.Tests.DbClasses;
 using Jameak.CursorPagination.Tests.InputClasses;
 using Microsoft.EntityFrameworkCore;
+using Xunit.Sdk;
 
 namespace Jameak.CursorPagination.Tests;
 
@@ -331,5 +332,94 @@ public class KeySetPaginatorTests : IClassFixture<DatabaseFixture>
             ComputeTotalCount.Never,
             dbContext => dbContext.PocoWithNestedPropertyTestTable.Include(e => e.NestedData).AsQueryable(),
             (dbContext => PocoWithNestedPropertyKeySetStrategyTestHelper.ApplyExpectedCorrectOrderForwardDirection(dbContext.PocoWithNestedPropertyTestTable.Include(e => e.NestedData).AsQueryable())));
+    }
+
+    [Theory]
+    [InlineData(PaginationDirection.Forward, ComputeTotalCount.Once, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Forward, ComputeTotalCount.EveryPage, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Forward, ComputeTotalCount.EveryPage, ComputeNextPage.Never)]
+    [InlineData(PaginationDirection.Backward, ComputeTotalCount.Once, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Backward, ComputeTotalCount.EveryPage, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Backward, ComputeTotalCount.EveryPage, ComputeNextPage.Never)]
+    public async Task TotalCountComputedViaFirstPageOptimizationDoesNotHitDatabase_Async(PaginationDirection direction, ComputeTotalCount computeTotal, ComputeNextPage computeNextPage)
+    {
+        var strategy = new SimplePropertyKeySetStrategy();
+        var dbContext = _databaseFactory.CreateDbContext();
+
+        // Act & Assert
+        var firstPage = await KeySetPaginator.ApplyPaginationAsync(
+            strategy,
+            TestHelper.TagTestQueryable(dbContext.SimplePropertyTestTable),
+            asyncMaterializationFunc: (queryable, _) => AsyncDelegates.SyncToList(queryable),
+            asyncCountFunc: (queryable, _) => throw new XunitException("When this optimization is hit, the code should never try to execute the Count-func"),
+            asyncAnyFunc: (queryable, _) => AsyncDelegates.SyncAny(queryable),
+            afterCursor: null,
+            pageSize: 999_999, // Page size higher than total number of elements in the table.
+            computeNextPage: computeNextPage,
+            computeTotalCount: computeTotal,
+            paginationDirection: direction);
+
+        var dbLogs = TestHelper.TaggedLogMessages(dbContext);
+        Assert.NotEmpty(dbLogs);
+        Assert.DoesNotContain("COUNT", string.Join("\n", dbLogs), StringComparison.InvariantCultureIgnoreCase);
+        Assert.Equal(dbContext.SimplePropertyTestTable.Count(), firstPage.TotalCount);
+    }
+
+    [Theory]
+    [InlineData(PaginationDirection.Forward, ComputeTotalCount.Once, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Forward, ComputeTotalCount.EveryPage, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Forward, ComputeTotalCount.EveryPage, ComputeNextPage.Never)]
+    [InlineData(PaginationDirection.Backward, ComputeTotalCount.Once, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Backward, ComputeTotalCount.EveryPage, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Backward, ComputeTotalCount.EveryPage, ComputeNextPage.Never)]
+    public async Task TotalCountComputedViaFirstPageOptimizationDoesNotHitDatabase(PaginationDirection direction, ComputeTotalCount computeTotal, ComputeNextPage computeNextPage)
+    {
+        var strategy = new SimplePropertyKeySetStrategy();
+        var dbContext = _databaseFactory.CreateDbContext();
+
+        // Act
+        var firstPage = KeySetPaginator.ApplyPagination(
+            strategy,
+            TestHelper.TagTestQueryable(dbContext.SimplePropertyTestTable),
+            afterCursor: null,
+            pageSize: 999_999, // Page size higher than total number of elements in the table.
+            computeNextPage: computeNextPage,
+            computeTotalCount: computeTotal,
+            paginationDirection: direction);
+
+        // Assert
+        var dbLogs = TestHelper.TaggedLogMessages(dbContext);
+        Assert.NotEmpty(dbLogs);
+        Assert.DoesNotContain("COUNT", string.Join("\n", dbLogs), StringComparison.InvariantCultureIgnoreCase);
+        Assert.Equal(dbContext.SimplePropertyTestTable.Count(), firstPage.TotalCount);
+    }
+
+    [Theory]
+    [InlineData(PaginationDirection.Forward, ComputeTotalCount.Once, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Forward, ComputeTotalCount.EveryPage, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Forward, ComputeTotalCount.EveryPage, ComputeNextPage.Never)]
+    [InlineData(PaginationDirection.Backward, ComputeTotalCount.Once, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Backward, ComputeTotalCount.EveryPage, ComputeNextPage.EveryPage)]
+    [InlineData(PaginationDirection.Backward, ComputeTotalCount.EveryPage, ComputeNextPage.Never)]
+    public async Task TotalCountIsCorrectForPageSizeZero(PaginationDirection direction, ComputeTotalCount computeTotal, ComputeNextPage computeNextPage)
+    {
+        var strategy = new SimplePropertyKeySetStrategy();
+        var dbContext = _databaseFactory.CreateDbContext();
+
+        // Act
+        var firstPage = KeySetPaginator.ApplyPagination(
+            strategy,
+            TestHelper.TagTestQueryable(dbContext.SimplePropertyTestTable),
+            afterCursor: null,
+            pageSize: 0,
+            computeNextPage: computeNextPage,
+            computeTotalCount: computeTotal,
+            paginationDirection: direction);
+
+        // Assert
+        var dbLogs = TestHelper.TaggedLogMessages(dbContext);
+        Assert.NotEmpty(dbLogs);
+        Assert.Contains("COUNT", string.Join("\n", dbLogs), StringComparison.InvariantCultureIgnoreCase);
+        Assert.Equal(dbContext.SimplePropertyTestTable.Count(), firstPage.TotalCount);
     }
 }

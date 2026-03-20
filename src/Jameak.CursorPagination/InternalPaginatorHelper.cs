@@ -100,6 +100,13 @@ internal static class InternalPaginatorHelper
         };
     }
 
+    internal static bool CanSetTotalCountFromCurrentPageCount<T, TCursor>(List<T> pageElements, TCursor? cursor, int pageSize)
+    {
+        var isFirstPage = cursor == null;
+        var pageElementsFewerThanRequested = pageElements.Count < pageSize;
+        return isFirstPage && pageElementsFewerThanRequested;
+    }
+
     internal static void ThrowIfEnumNotDefined<T>(T argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null) where T : struct, Enum
     {
         if (!Enum.IsDefined(argument))
