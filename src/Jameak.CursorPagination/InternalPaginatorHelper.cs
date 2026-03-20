@@ -100,7 +100,7 @@ internal static class InternalPaginatorHelper
         };
     }
 
-    internal static bool CanSetTotalCountFromCurrentPageCount<T, TCursor>(List<T> pageElements, TCursor? cursor, int pageSize)
+    internal static bool CanSetTotalCountFromCurrentPageCount<T, TCursor>(List<T> pageElements, TCursor? cursor, int pageSize) where TCursor : class
     {
         var isFirstPage = cursor == null;
         var pageElementsFewerThanRequested = pageElements.Count < pageSize;
